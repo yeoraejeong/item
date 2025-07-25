@@ -6,6 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     h1, h2, h3, h4, h5, h6, .popup-title, .popup-box label, .badge-sr, .badge-r, .badge-n, .admin-bar .admin-add-btn, .top-bar .admin-btn, .card-btns button {
+    input#admin-pw::placeholder {
+      font-size: 0.72em;
+      color: #aaa !important;
+    }
       font-family: 'Freesentation6', 'Freesentation3', 'Noto Sans KR', sans-serif !important;
     }
     .top-title {
@@ -166,7 +170,7 @@
   <div class="top-bar">
     <div style="display:flex;align-items:center;gap:0.9em;">
       <span class="top-title">32f6c7 중복글</span>
-      <input id="admin-pw" type="password" placeholder="비밀번호" style="width:110px;">
+      <input id="admin-pw" type="password" placeholder="비밀번호" style="width:185px;font-size:0.75em;">
       <button id="admin-login-btn" class="admin-btn">관리자모드</button>
       <!-- <span id="last-modified-info" style="color:#616161; font-size:0.97em; margin-left:0.95em;"></span> -->
     </div>
