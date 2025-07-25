@@ -79,8 +79,15 @@
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none; /* Firefox */
       background: none !important;
+      overscroll-behavior-x: contain;
+      scroll-behavior: smooth;
     }
-    .category-tabs::-webkit-scrollbar { display: none; }
+    .category-tabs::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+      background: none !important;
+    }
 
     .cat-btn {
       border: none;
@@ -96,6 +103,7 @@
       height: 34px;
       box-shadow: 0 2px 7px 0 #bbb2;
       transition: box-shadow 0.2s;
+      margin: 0 !important;
     }
     .cat-btn img {
       width: 24px;
