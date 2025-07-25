@@ -66,7 +66,7 @@
     @media (max-width: 600px) {
       .main {padding:0;}
       .card-list {gap:0.8em;}
-      .item-card {width:28vw; min-width:60px;}
+      .item-card {width:27vw; min-width:55px;}
       .admin-bar {padding:1.2em 1em;}
     }
     /* category-tabs */
@@ -78,12 +78,13 @@
       padding-bottom: 0.3em;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none; /* Firefox */
+      background: none !important;
     }
     .category-tabs::-webkit-scrollbar { display: none; }
 
     .cat-btn {
       border: none;
-      background: transparent;
+      background: transparent !important;
       cursor: pointer;
       padding: 0.15em 0.3em;
       border-radius: 0.6em;
@@ -98,7 +99,7 @@
     }
     .cat-btn.selected {
       /* 배경 제거, 그림자 강조만 */
-      box-shadow: 0 4px 16px 0 #9af  !important;
+      box-shadow: 0 4px 16px 0 !important;
     }
     .cat-btn img {
       width: 24px;
