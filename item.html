@@ -6,15 +6,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
   .category-tabs {
-    display: flex; gap: 0.26em; margin-bottom: 1.1em; justify-content: center; flex-wrap:wrap;
+    display: block;
+    white-space: nowrap;
+    overflow-x: auto;
+    max-width: 100vw;
+    margin-bottom: 1.1em;
   }
   .cat-btn {
+    display: inline-flex;
+    min-width: 44px;
+    flex: none;
+    justify-content: center;
     background: none; border: none; outline: none;
     padding: 0.22em 0.22em 0.11em 0.22em;
-    display: flex; flex-direction: column; align-items: center;
+    flex-direction: column; align-items: center;
     font-size: 0.82em; color: #555; cursor: pointer;
     border-radius: 1em;
     transition: color 0.15s, background 0.18s;
+    margin-right: 0.08em;
   }
   .cat-btn.selected {
     color: #fd47b4; background: #fff1fb;
@@ -109,46 +118,46 @@
     <!-- ↓↓↓ 카테고리 탭을 top-bar-filters 바로 아래로 이동!! ↓↓↓ -->
     <div class="category-tabs">
       <button class="cat-btn selected" data-cat="">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_all.png" alt="전체"><span>전체</span>
+        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_all.png" alt="전체">
       </button>
       <button class="cat-btn" data-cat="헤어">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_hair.PNG" alt="헤어"><span>헤어</span>
+        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_hair.png" alt="헤어">
       </button>
       <button class="cat-btn" data-cat="상하의">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_clothes.PNG" alt="상하의"><span>상하의</span>
+        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_clothes.png" alt="상하의">
       </button>
       <button class="cat-btn" data-cat="남옷">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_boy.PNG" alt="남옷"><span>남옷</span>
+        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_boy.png" alt="남옷">
       </button>
       <button class="cat-btn" data-cat="여옷">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_girl.PNG" alt="여옷"><span>여옷</span>
+        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_girl.png" alt="여옷">
       </button>
       <button class="cat-btn" data-cat="겉옷">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_outer.PNG" alt="겉옷"><span>겉옷</span>
+        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_outer.png" alt="겉옷">
       </button>
       <button class="cat-btn" data-cat="신발">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_shoes.PNG" alt="신발"><span>신발</span>
+        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_shoes.png" alt="신발">
       </button>
       <button class="cat-btn" data-cat="모자">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_hat.PNG" alt="모자"><span>모자</span>
+        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_hat.png" alt="모자">
       </button>
       <button class="cat-btn" data-cat="리본">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_ribbon.PNG" alt="리본"><span>리본</span>
+        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_ribbon.png" alt="리본">
       </button>
       <button class="cat-btn" data-cat="안경">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_glasses.PNG" alt="안경"><span>안경</span>
+        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_glasses.png" alt="안경">
       </button>
       <button class="cat-btn" data-cat="왼손">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_left.PNG" alt="왼손"><span>왼손</span>
+        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_left.png" alt="왼손">
       </button>
       <button class="cat-btn" data-cat="오른손">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_right.PNG" alt="오른손"><span>오른손</span>
+        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_right.png" alt="오른손">
       </button>
       <button class="cat-btn" data-cat="몸통">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_body.PNG" alt="몸통"><span>몸통</span>
+        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_body.png" alt="몸통">
       </button>
       <button class="cat-btn" data-cat="아우라">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_aura.png" alt="아우라"><span>아우라</span>
+        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_aura.png" alt="아우라">
       </button>
     </div>
   </div>
@@ -210,6 +219,111 @@
   <script>
     // ... (여기에 기존 js 그대로 - 위 oboe.edit_file 패치 예시 포함)
     // (JS 전체 원하면 바로 내려줄 수 있음. 위 구조는 위치 완벽!)
+
+    // 카테고리 탭 아이콘 교체 및 필터링
+    const iconMap = {
+      "": {
+        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_all.png",
+        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_all.png"
+      },
+      "헤어": {
+        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_hair.png",
+        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_hair.png"
+      },
+      "상하의": {
+        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_clothes.png",
+        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_clothes.png"
+      },
+      "남옷": {
+        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_boy.png",
+        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_boy.png"
+      },
+      "여옷": {
+        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_girl.png",
+        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_girl.png"
+      },
+      "겉옷": {
+        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_outer.png",
+        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_outer.png"
+      },
+      "신발": {
+        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_shoes.png",
+        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_shoes.png"
+      },
+      "모자": {
+        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_hat.png",
+        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_hat.png"
+      },
+      "리본": {
+        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_ribbon.png",
+        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_ribbon.png"
+      },
+      "안경": {
+        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_glasses.png",
+        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_glasses.png"
+      },
+      "왼손": {
+        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_left.png",
+        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_left.png"
+      },
+      "오른손": {
+        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_right.png",
+        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_right.png"
+      },
+      "몸통": {
+        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_body.png",
+        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_body.png"
+      },
+      "아우라": {
+        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_aura.png",
+        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_aura.png"
+      }
+    };
+
+    document.addEventListener("DOMContentLoaded", function() {
+      const btns = document.querySelectorAll('.cat-btn');
+      // 초기 전체만 ac, 나머지는 de
+      btns.forEach(b => {
+        const cat = b.getAttribute('data-cat');
+        const img = b.querySelector('img');
+        if (cat === "") {
+          b.classList.add('selected');
+          if (iconMap[""]) img.src = iconMap[""].ac;
+        } else {
+          b.classList.remove('selected');
+          if (iconMap[cat]) img.src = iconMap[cat].de;
+        }
+      });
+      // 클릭 이벤트
+      btns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          btns.forEach(b => {
+            b.classList.remove('selected');
+            const cat = b.getAttribute('data-cat');
+            const img = b.querySelector('img');
+            if (iconMap[cat]) img.src = iconMap[cat].de;
+          });
+          btn.classList.add('selected');
+          const cat = btn.getAttribute('data-cat');
+          const img = btn.querySelector('img');
+          if (iconMap[cat]) img.src = iconMap[cat].ac;
+          // 카드 필터 함수 호출
+          filterCategory(cat);
+        });
+      });
+      // 초기 필터링
+      filterCategory("");
+    });
+
+    // filterCategory 함수는 drawCards와 연결 (카테고리별 필터링)
+    function filterCategory(cat) {
+      // 이 함수는 drawCards와 연결되어야 하며, cat(카테고리명) 인자를 받아서 해당 카테고리만 필터링해서 보여줍니다.
+      // 예시: drawCards({ category: cat });
+      // 실제 drawCards 구현에 맞게 연결하세요.
+      if (typeof drawCards === "function") {
+        drawCards({ category: cat });
+      }
+    }
   </script>
 </body>
 </html>
