@@ -5,7 +5,24 @@
   <title>포켓미니 아이템 전체 목록</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body { background: #f5f6fa; font-family: 'Noto Sans KR', sans-serif; margin:0; }
+    h1, h2, h3, h4, h5, h6, .popup-title, .top-bar span, .popup-box label, .badge-sr, .badge-r, .badge-n, .admin-bar .admin-add-btn, .top-bar .admin-btn, .card-btns button {
+      font-family: 'Freesentation6', 'Freesentation3', 'Noto Sans KR', sans-serif !important;
+    }
+    @font-face {
+      font-family: 'Freesentation3';
+      src: url('./free3.ttf') format('truetype');
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Freesentation6';
+      src: url('./free6.ttf') format('truetype');
+      font-display: swap;
+    }
+    html, body, .main {
+      max-width: 100vw !important;
+      overflow-x: hidden !important;
+    }
+    body { background: #f5f6fa; font-family: 'Freesentation3', 'Noto Sans KR', sans-serif; margin:0; }
     /* overflow-x: auto/scroll 제거 */
     /* .top-bar, .main 등에서 overflow-x 관련 스타일 없음 확인 */
     .top-bar {
@@ -26,7 +43,7 @@
     }
     .top-bar input[type=password], .top-bar input[type=text] {padding:0.6em; border-radius:0.7em; border:1px solid #cbd3da; font-size:1em;}
     .top-bar select {padding:0.5em 0.8em; border-radius:0.7em; border:1.2px solid #dbe1ea; background:#f4f5fb;}
-    .top-bar button {padding:0.65em 1.2em; border-radius:0.8em; background:#a6aefc; color:#1a237e; border:none; font-weight:bold; cursor:pointer;}
+    .top-bar button {padding:0.65em 1.2em; border-radius:0.8em; background:#a6aefc; color:#1a237e; border:none; cursor:pointer;}
     .top-bar .admin-btn {background:#222; color:#fff;}
     .main {max-width:1120px; margin:2.5em auto 0; padding:0 1em;}
     .card-list {display:flex; flex-wrap:wrap; gap:1.5em; margin-top:2.3em;}
@@ -41,7 +58,7 @@
       display: block;
       box-shadow:0 0 4px #0001;
     }
-    .item-card .badge { display:inline-block; font-weight:bold; font-size:0.98em; padding:0.19em 1.1em; border-radius:0.9em; margin-bottom:0.25em;}
+    .item-card .badge { display:inline-block; font-size:0.98em; padding:0.19em 1.1em; border-radius:0.9em; margin-bottom:0.25em;}
     .badge-sr { background:#fff6c1; color:#be9800;}
     .badge-r { background:#ececec; color:#7d7d7d;}
     .badge-n { background:#c8e6ff; color:#1976d2;}
@@ -58,10 +75,10 @@
     /* 팝업 */
     .popup-bg {display:none;position:fixed;z-index:10;left:0;top:0;width:100vw;height:100vh;background:#2227;}
     .popup-box {display:none;position:fixed;z-index:11;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border-radius:1.3em;box-shadow:0 4px 24px #0004;padding:2.2em 2em 1.2em;min-width:320px;max-width:90vw;}
-    .popup-box label{font-weight:bold;display:block;margin-top:1em;}
+    .popup-box label{display:block;margin-top:1em;}
     .popup-box input, .popup-box select {width:100%;font-size:1em;margin:0.45em 0 0.2em;padding:0.7em 0.9em;border-radius:0.8em;border:1.1px solid #cbd3da;box-sizing:border-box;}
     .popup-box .popup-btns{margin-top:1.5em;text-align:center;}
-    .popup-box button{padding:0.6em 1.3em;border-radius:0.8em;border:none;font-weight:bold;cursor:pointer;}
+    .popup-box button{padding:0.6em 1.3em;border-radius:0.8em;border:none;cursor:pointer;}
     .popup-box .popup-save{background:#a6f1b7;color:#18713a;margin-right:0.8em;}
     .popup-box .popup-cancel{background:#ececec;color:#7d7d7d;}
     /* 모바일 2열 */
@@ -435,3 +452,4 @@
   </script>
 </body>
 </html>
+    /* Remove font-weight from h1~h6 if present (none in original) */
