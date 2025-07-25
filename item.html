@@ -48,9 +48,7 @@
       padding: 1.2em 1.2em 0.5em;
       background: #fff;
       border-bottom: 1px solid #f1f3f9;
-      position: sticky;
-      top: 0;
-      z-index: 99;
+      /* Removed sticky positioning so top-bar scrolls away normally */
     }
     .top-bar-filters {
       display: flex;
@@ -456,16 +454,8 @@
     };
 
     function renderFilterPopup() {
-      // 연도/테마 체크박스, 테마명 검색 input
-      // 테마는 allThemes 기준, 테마명 키워드로 필터
-      const themeKeyword = integratedFilter.themeKeyword || "";
-      let filteredThemes = allThemes;
-      if (themeKeyword.trim().length > 0) {
-        filteredThemes = allThemes.filter(t=>t && t.includes(themeKeyword));
-      }
-      // 팝업 HTML
-      // 필터 팝업 스타일: 버튼형 토글 chips
-      // 스타일 삽입 (한 번만)
+      // --- 통합 필터 팝업: 연도 chips, 테마 분류 필터(검색 후 chips), 하단에 위치 ---
+      // Insert chip style only once
       if (!document.getElementById('filter-chip-style')) {
         const style = document.createElement('style');
         style.id = 'filter-chip-style';
@@ -504,8 +494,9 @@
         `;
         document.head.appendChild(style);
       }
-      filterPopupBox.innerHTML = `
-        <h2 class="popup-title" style="margin:0 0 1em;font-size:1.13em;">통합 필터</h2>
+
+      // --- 연도 chips section ---
+      let yearSection = `
         <div>
           <label style="margin-bottom:0.2em;font-size:1em;">연도</label>
           <div style="max-height:120px;overflow-y:auto;border:1px solid #e3e6ef;border-radius:0.8em;padding:0.7em 0.5em 0.7em 0.5em;display:flex;flex-wrap:wrap;gap:0.13em 0.1em;">
@@ -520,11 +511,27 @@
             `).join("")}
           </div>
         </div>
-        <div style="margin-top:1.25em;">
-          <label style="margin-bottom:0.2em;font-size:1em;">테마분류</label>
-          <input id="filter-popup-theme-search" type="text" placeholder="테마 이름(테마명) 검색" value="${themeKeyword.replace(/"/g,'&quot;')}" style="width:100%;margin-bottom:0.5em;padding:0.55em 0.8em;font-size:1em;border-radius:0.7em;border:1px solid #cbd3da;">
+      `;
+
+      // --- 테마 chips section: only appears after search ---
+      // Place at the bottom, under the buttons
+      let themeKeyword = integratedFilter.themeKeyword || "";
+      let themeChipsSection = "";
+      let showThemeChips = !!window._themeSearchTriggered;
+      let filteredThemes = allThemes;
+      if (showThemeChips && themeKeyword.trim().length > 0) {
+        filteredThemes = allThemes.filter(t=>t && t.includes(themeKeyword));
+      } else if (showThemeChips && themeKeyword.trim().length === 0) {
+        filteredThemes = [];
+      }
+      if (showThemeChips) {
+        themeChipsSection = `
+        <div id="filter-popup-theme-chips-section" style="margin-top:1.25em;">
+          <label style="margin-bottom:0.2em;font-size:1em;">테마 분류 결과</label>
           <div style="max-height:150px;overflow-y:auto;border:1px solid #e3e6ef;border-radius:0.8em;padding:0.7em 0.5em 0.7em 0.5em;display:flex;flex-wrap:wrap;gap:0.13em 0.1em;">
-            ${filteredThemes.map(t=>`
+            ${filteredThemes.length === 0
+              ? `<span style="color:#999;font-size:0.97em;">검색 결과가 없습니다.</span>`
+              : filteredThemes.map(t=>`
               <button type="button"
                 class="filter-chip filter-popup-theme${integratedFilter.themes.includes(t) ? " selected" : ""}"
                 data-value="${t.replace(/"/g,'&quot;')}"
@@ -535,12 +542,38 @@
             `).join("")}
           </div>
         </div>
+        `;
+      }
+
+      // --- 테마 검색 input and search button, at bottom of popup ---
+      let themeSearchSection = `
+        <div style="margin-top:2.2em;">
+          <label style="margin-bottom:0.2em;font-size:1em;">테마 분류 검색</label>
+          <div style="display:flex;gap:0.6em;">
+            <input id="filter-popup-theme-search" type="text" placeholder="테마 이름(테마명) 검색" value="${themeKeyword.replace(/"/g,'&quot;')}" style="flex:2;width:100%;margin-bottom:0.5em;padding:0.55em 0.8em;font-size:1em;border-radius:0.7em;border:1px solid #cbd3da;">
+            <button id="filter-popup-theme-search-btn" style="padding:0.6em 1.3em;border-radius:0.8em;background:#a6aefc;color:#1a237e;border:none;font-size:1em;cursor:pointer;">검색</button>
+          </div>
+        </div>
+      `;
+
+      // --- popup buttons (apply/reset) ---
+      let popupBtns = `
         <div class="popup-btns" style="margin-top:2em;text-align:center;">
           <button id="filter-popup-apply" class="popup-save" style="background:#a6aefc;color:#1a237e;margin-right:0.7em;">필터 적용</button>
           <button id="filter-popup-reset" class="popup-cancel" style="background:#ececec;color:#7d7d7d;">초기화</button>
         </div>
       `;
-      // 이벤트 바인딩: 연도 버튼
+
+      // Compose popup HTML: year section, search input, popupBtns, theme chips (theme chips always at very bottom)
+      filterPopupBox.innerHTML = `
+        <h2 class="popup-title" style="margin:0 0 1em;font-size:1.13em;">통합 필터</h2>
+        ${yearSection}
+        ${themeSearchSection}
+        ${popupBtns}
+        ${themeChipsSection}
+      `;
+
+      // --- Bind year chips ---
       filterPopupBox.querySelectorAll(".filter-popup-year").forEach(btn=>{
         btn.onclick = function() {
           const val = btn.getAttribute("data-value");
@@ -552,49 +585,66 @@
             integratedFilter.years.splice(idx, 1);
             btn.classList.remove("selected");
           }
-          renderFilterPopup(); // 다시 그려서 스타일 반영
+          renderFilterPopup(); // redraw for style
           updateFilterSelectedCount();
         };
       });
-      // 이벤트 바인딩: 테마 버튼
-      filterPopupBox.querySelectorAll(".filter-popup-theme").forEach(btn=>{
-        btn.onclick = function() {
-          const val = btn.getAttribute("data-value");
-          const idx = integratedFilter.themes.indexOf(val);
-          if (idx === -1) {
-            integratedFilter.themes.push(val);
-            btn.classList.add("selected");
-          } else {
-            integratedFilter.themes.splice(idx, 1);
-            btn.classList.remove("selected");
-          }
-          renderFilterPopup();
-          updateFilterSelectedCount();
-        };
-      });
-      // 테마명 검색 input
+
+      // --- Theme chips (only if visible) ---
+      if (showThemeChips) {
+        filterPopupBox.querySelectorAll(".filter-popup-theme").forEach(btn=>{
+          btn.onclick = function() {
+            const val = btn.getAttribute("data-value");
+            const idx = integratedFilter.themes.indexOf(val);
+            if (idx === -1) {
+              integratedFilter.themes.push(val);
+              btn.classList.add("selected");
+            } else {
+              integratedFilter.themes.splice(idx, 1);
+              btn.classList.remove("selected");
+            }
+            renderFilterPopup();
+            updateFilterSelectedCount();
+          };
+        });
+      }
+
+      // --- 테마명 검색 input: typing does NOT show chips, only search button does
       const themeSearchInput = document.getElementById("filter-popup-theme-search");
       themeSearchInput.oninput = function() {
         integratedFilter.themeKeyword = themeSearchInput.value;
+        // Do NOT show chips on typing, only after search
+        // Optionally: clear theme selection when query changes
+        // integratedFilter.themes = [];
+        window._themeSearchTriggered = false;
         renderFilterPopup();
         // 커서 유지
         let inp = document.getElementById("filter-popup-theme-search");
         if (inp) inp.selectionStart = inp.selectionEnd = inp.value.length;
         updateFilterSelectedCount();
       };
-      // 필터 적용
+      // --- Search button: show chips below ---
+      document.getElementById("filter-popup-theme-search-btn").onclick = function(e) {
+        e.preventDefault();
+        window._themeSearchTriggered = true;
+        renderFilterPopup();
+        updateFilterSelectedCount();
+      };
+
+      // --- 필터 적용 ---
       document.getElementById("filter-popup-apply").onclick = function(e) {
         e.preventDefault();
         filterPopupBg.style.display = filterPopupBox.style.display = "none";
         updateFilterSelectedCount();
         drawCards();
       };
-      // 초기화
+      // --- 초기화 ---
       document.getElementById("filter-popup-reset").onclick = function(e) {
         e.preventDefault();
         integratedFilter.years = [];
         integratedFilter.themes = [];
         integratedFilter.themeKeyword = "";
+        window._themeSearchTriggered = false;
         renderFilterPopup();
         updateFilterSelectedCount();
       };
