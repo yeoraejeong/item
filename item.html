@@ -76,7 +76,11 @@
       gap: 0.5em;
       overflow-x: auto;
       padding-bottom: 0.3em;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; /* Firefox */
     }
+    .category-tabs::-webkit-scrollbar { display: none; }
+
     .cat-btn {
       border: none;
       background: transparent;
@@ -89,11 +93,12 @@
       flex-shrink: 0;
       width: 34px;
       height: 34px;
-      transition: background-color 0.2s ease;
+      box-shadow: 0 2px 7px 0 #bbb2;
+      transition: box-shadow 0.2s;
     }
     .cat-btn.selected {
-      background-color: #a6aefc;
-      border-radius: 0.9em;
+      /* 배경 제거, 그림자 강조만 */
+      box-shadow: 0 4px 16px 0 #9af  !important;
     }
     .cat-btn img {
       width: 24px;
