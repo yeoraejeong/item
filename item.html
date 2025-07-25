@@ -168,6 +168,7 @@
       <span class="top-title">32f6c7 중복글</span>
       <input id="admin-pw" type="password" placeholder="비밀번호" style="width:110px;">
       <button id="admin-login-btn" class="admin-btn">관리자모드</button>
+      <span id="last-modified-info" style="color:#616161; font-size:0.97em; margin-left:0.95em;"></span>
     </div>
     <div class="top-bar-filters">
       <input id="search-keyword" type="text" placeholder="템 이름 검색" style="min-width:220px;flex:2;">
@@ -318,6 +319,7 @@
       setFilters();
       renderCategoryTabs();
       drawCards();
+      showLastModified();
     }
 
     function setFilters() {
@@ -488,6 +490,18 @@
     }, {passive:true});
     // --- 최초 렌더 ---
     loadItems();
+
+    function showLastModified() {
+      const info = document.getElementById("last-modified-info");
+      if (!allItems.length) { info.textContent = ""; return; }
+      let last = allItems.map(x=>x.updated_at || x.date)
+        .filter(Boolean).sort().reverse()[0];
+      if (!last) { info.textContent = ""; return; }
+      // yyyy. MM. dd. HH:mm 포맷
+      let dt = new Date(last);
+      let s = `${dt.getFullYear()}. ${String(dt.getMonth()+1).padStart(2,"0")}. ${String(dt.getDate()).padStart(2,"0")}. ${String(dt.getHours()).padStart(2,"0")}:${String(dt.getMinutes()).padStart(2,"0")}`;
+      info.textContent = `마지막 수정: ${s}`;
+    }
   </script>
 </body>
 </html>
