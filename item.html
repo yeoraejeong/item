@@ -464,26 +464,74 @@
         filteredThemes = allThemes.filter(t=>t && t.includes(themeKeyword));
       }
       // 팝업 HTML
+      // 필터 팝업 스타일: 버튼형 토글 chips
+      // 스타일 삽입 (한 번만)
+      if (!document.getElementById('filter-chip-style')) {
+        const style = document.createElement('style');
+        style.id = 'filter-chip-style';
+        style.textContent = `
+        .filter-chip {
+          display: inline-block;
+          border: none;
+          outline: none;
+          cursor: pointer;
+          border-radius: 0.7em;
+          font-size: 1em;
+          font-family: 'Freesentation6', 'Noto Sans KR', sans-serif;
+          padding: 0.2em 0.8em;
+          margin: 0 0.22em 0.22em 0;
+          background: #f5f6fa;
+          color: #24304b;
+          font-weight: 400;
+          transition: background 0.15s, font-weight 0.15s;
+          min-width: 2.2em;
+        }
+        .filter-chip.selected {
+          background: #e2e8fc !important;
+          color: #1a237e !important;
+          font-weight: bold !important;
+          font-family: 'Freesentation6', 'Noto Sans KR', sans-serif !important;
+        }
+        .filter-chip:active {
+          background: #c8d7fa;
+        }
+        .filter-chip.filter-popup-year {
+          padding: 0.22em 0.9em;
+        }
+        .filter-chip.filter-popup-theme {
+          padding: 0.22em 0.9em;
+        }
+        `;
+        document.head.appendChild(style);
+      }
       filterPopupBox.innerHTML = `
         <h2 class="popup-title" style="margin:0 0 1em;font-size:1.13em;">통합 필터</h2>
         <div>
           <label style="margin-bottom:0.2em;font-size:1em;">연도</label>
-          <div style="max-height:120px;overflow-y:auto;border:1px solid #e3e6ef;border-radius:0.8em;padding:0.7em 0.9em 0.7em 0.9em;display:flex;flex-wrap:wrap;gap:0.85em 1.4em;">
+          <div style="max-height:120px;overflow-y:auto;border:1px solid #e3e6ef;border-radius:0.8em;padding:0.7em 0.5em 0.7em 0.5em;display:flex;flex-wrap:wrap;gap:0.13em 0.1em;">
             ${allYears.map(y=>`
-              <label style="margin-bottom:0;margin-right:0.5em;display:inline-flex;align-items:center;font-size:1em;">
-                <input type="checkbox" class="filter-popup-year" value="${y}" ${integratedFilter.years.includes(y)?"checked":""} style="margin-right:0.5em;">${y}
-              </label>
+              <button type="button"
+                class="filter-chip filter-popup-year${integratedFilter.years.includes(y) ? " selected" : ""}"
+                data-value="${y}"
+                style="${integratedFilter.years.includes(y)
+                  ? 'background:#e2e8fc;color:#1a237e;font-weight:bold;font-family:Freesentation6, Noto Sans KR, sans-serif;'
+                  : 'background:#f5f6fa;color:#24304b;font-weight:400;font-family:Freesentation6, Noto Sans KR, sans-serif;'}"
+              >${y}</button>
             `).join("")}
           </div>
         </div>
         <div style="margin-top:1.25em;">
           <label style="margin-bottom:0.2em;font-size:1em;">테마분류</label>
           <input id="filter-popup-theme-search" type="text" placeholder="테마 이름(테마명) 검색" value="${themeKeyword.replace(/"/g,'&quot;')}" style="width:100%;margin-bottom:0.5em;padding:0.55em 0.8em;font-size:1em;border-radius:0.7em;border:1px solid #cbd3da;">
-          <div style="max-height:150px;overflow-y:auto;border:1px solid #e3e6ef;border-radius:0.8em;padding:0.7em 0.9em 0.7em 0.9em;display:flex;flex-wrap:wrap;gap:0.85em 1.4em;">
+          <div style="max-height:150px;overflow-y:auto;border:1px solid #e3e6ef;border-radius:0.8em;padding:0.7em 0.5em 0.7em 0.5em;display:flex;flex-wrap:wrap;gap:0.13em 0.1em;">
             ${filteredThemes.map(t=>`
-              <label style="margin-bottom:0;margin-right:0.5em;display:inline-flex;align-items:center;font-size:1em;">
-                <input type="checkbox" class="filter-popup-theme" value="${t.replace(/"/g,'&quot;')}" ${integratedFilter.themes.includes(t)?"checked":""} style="margin-right:0.5em;">${t}
-              </label>
+              <button type="button"
+                class="filter-chip filter-popup-theme${integratedFilter.themes.includes(t) ? " selected" : ""}"
+                data-value="${t.replace(/"/g,'&quot;')}"
+                style="${integratedFilter.themes.includes(t)
+                  ? 'background:#e2e8fc;color:#1a237e;font-weight:bold;font-family:Freesentation6, Noto Sans KR, sans-serif;'
+                  : 'background:#f5f6fa;color:#24304b;font-weight:400;font-family:Freesentation6, Noto Sans KR, sans-serif;'}"
+              >${t}</button>
             `).join("")}
           </div>
         </div>
@@ -492,24 +540,35 @@
           <button id="filter-popup-reset" class="popup-cancel" style="background:#ececec;color:#7d7d7d;">초기화</button>
         </div>
       `;
-      // 이벤트 바인딩
-      filterPopupBox.querySelectorAll(".filter-popup-year").forEach(cb=>{
-        cb.onchange = function() {
-          if (cb.checked) {
-            if (!integratedFilter.years.includes(cb.value)) integratedFilter.years.push(cb.value);
+      // 이벤트 바인딩: 연도 버튼
+      filterPopupBox.querySelectorAll(".filter-popup-year").forEach(btn=>{
+        btn.onclick = function() {
+          const val = btn.getAttribute("data-value");
+          const idx = integratedFilter.years.indexOf(val);
+          if (idx === -1) {
+            integratedFilter.years.push(val);
+            btn.classList.add("selected");
           } else {
-            integratedFilter.years = integratedFilter.years.filter(y=>y!==cb.value);
+            integratedFilter.years.splice(idx, 1);
+            btn.classList.remove("selected");
           }
+          renderFilterPopup(); // 다시 그려서 스타일 반영
           updateFilterSelectedCount();
         };
       });
-      filterPopupBox.querySelectorAll(".filter-popup-theme").forEach(cb=>{
-        cb.onchange = function() {
-          if (cb.checked) {
-            if (!integratedFilter.themes.includes(cb.value)) integratedFilter.themes.push(cb.value);
+      // 이벤트 바인딩: 테마 버튼
+      filterPopupBox.querySelectorAll(".filter-popup-theme").forEach(btn=>{
+        btn.onclick = function() {
+          const val = btn.getAttribute("data-value");
+          const idx = integratedFilter.themes.indexOf(val);
+          if (idx === -1) {
+            integratedFilter.themes.push(val);
+            btn.classList.add("selected");
           } else {
-            integratedFilter.themes = integratedFilter.themes.filter(t=>t!==cb.value);
+            integratedFilter.themes.splice(idx, 1);
+            btn.classList.remove("selected");
           }
+          renderFilterPopup();
           updateFilterSelectedCount();
         };
       });
