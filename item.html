@@ -497,9 +497,12 @@
 
     function showLastModified() {
       const adminPwInput = document.getElementById("admin-pw");
-      // 현재 시각을 기준으로 표시
-      const dt = new Date();
-      const s = `${dt.getFullYear()}. ${String(dt.getMonth()+1).padStart(2,"0")}. ${String(dt.getDate()).padStart(2,"0")}. ${String(dt.getHours()).padStart(2,"0")}:${String(dt.getMinutes()).padStart(2,"0")}`;
+      // 아이템의 updated_at, 없으면 date 중 가장 최신값 표시
+      let allTimes = allItems.map(x => x.updated_at || x.date).filter(Boolean);
+      if (!allTimes.length) { adminPwInput.placeholder = "마지막 수정: -"; return; }
+      let last = allTimes.sort().reverse()[0];
+      let dt = new Date(last);
+      let s = `${dt.getFullYear()}. ${String(dt.getMonth()+1).padStart(2,"0")}. ${String(dt.getDate()).padStart(2,"0")}. ${String(dt.getHours()).padStart(2,"0")}:${String(dt.getMinutes()).padStart(2,"0")}`;
       adminPwInput.placeholder = `마지막 수정: ${s}`;
     }
   </script>
