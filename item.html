@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body { background: #f5f6fa; font-family: 'Noto Sans KR', sans-serif; margin:0; }
+    /* overflow-x: auto/scroll 제거 */
+    /* .top-bar, .main 등에서 overflow-x 관련 스타일 없음 확인 */
     .top-bar {
       display: flex;
       flex-direction: column;
@@ -421,6 +423,13 @@
       }
     };
 
+    // 카테고리 탭 가로 스크롤시 전체 페이지에 가로 스크롤 전파 안 되도록!
+    document.getElementById('category-tabs').addEventListener('wheel', function(e){
+      if (e.deltaX !== 0) e.stopPropagation();
+    }, {passive:true});
+    document.getElementById('category-tabs').addEventListener('touchmove', function(e){
+      e.stopPropagation();
+    }, {passive:true});
     // --- 최초 렌더 ---
     loadItems();
   </script>
