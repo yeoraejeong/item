@@ -495,15 +495,17 @@
     // --- 최초 렌더 ---
     loadItems();
 
-    function showLastModified() {
-      const adminPwInput = document.getElementById("admin-pw");
-      // 아이템의 updated_at, 없으면 date 중 가장 최신값 표시
-      let allTimes = allItems.map(x => x.updated_at || x.date).filter(Boolean);
-      if (!allTimes.length) { adminPwInput.placeholder = "마지막 수정: -"; return; }
-      let last = allTimes.sort().reverse()[0];
-      let dt = new Date(last);
-      let s = `${dt.getFullYear()}. ${String(dt.getMonth()+1).padStart(2,"0")}. ${String(dt.getDate()).padStart(2,"0")}. ${String(dt.getHours()).padStart(2,"0")}:${String(dt.getMinutes()).padStart(2,"0")}`;
-      adminPwInput.placeholder = `마지막 수정: ${s}`;
+    async function showLastModified() {
+      // log 테이블에서 가장 최근 at 필드
+      const { data, error } = await supabase.from('items_log').select('at').order('at', { ascending: false }).limit(1);
+      const el = document.querySelector('.last-modified-info');
+      if (error || !data?.length) {
+        el.textContent = "마지막 수정: -";
+        return;
+      }
+      const last = new Date(data[0].at);
+      let s = `${last.getFullYear()}. ${String(last.getMonth()+1).padStart(2,"0")}. ${String(last.getDate()).padStart(2,"0")}. ${String(last.getHours()).padStart(2,"0")}:${String(last.getMinutes()).padStart(2,"0")}`;
+      el.textContent = `마지막 수정: ${s}`;
     }
   </script>
 </body>
