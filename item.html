@@ -69,6 +69,39 @@
       .item-card {width:48vw; min-width:120px;}
       .admin-bar {padding:1.2em 1em;}
     }
+    /* category-tabs */
+    .category-tabs {
+      margin-top: 0.6em;
+      display: flex;
+      gap: 0.5em;
+      overflow-x: auto;
+      padding-bottom: 0.3em;
+    }
+    .cat-btn {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      padding: 0.15em 0.3em;
+      border-radius: 0.6em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 34px;
+      height: 34px;
+      transition: background-color 0.2s ease;
+    }
+    .cat-btn.selected {
+      background-color: #a6aefc;
+      border-radius: 0.9em;
+    }
+    .cat-btn img {
+      width: 24px;
+      height: 24px;
+      display: block;
+      pointer-events: none;
+      user-select: none;
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -85,6 +118,7 @@
       <select id="filter-year"><option value="">연도</option></select>
       <select id="filter-theme01"><option value="">테마분류</option></select>
     </div>
+    <div class="category-tabs" id="category-tabs"></div>
   </div>
   <!-- 관리자만: 관리바 -->
   <div class="main">
@@ -113,6 +147,24 @@
           <option value="N">N</option>
         </select>
       </label>
+      <label>카테고리
+        <select id="form-category" required>
+          <option value="">카테고리 선택</option>
+          <option>헤어</option>
+          <option>상하의</option>
+          <option>남옷</option>
+          <option>여옷</option>
+          <option>겉옷</option>
+          <option>신발</option>
+          <option>모자</option>
+          <option>리본</option>
+          <option>안경</option>
+          <option>왼손</option>
+          <option>오른손</option>
+          <option>몸통</option>
+          <option>아우라</option>
+        </select>
+      </label>
       <label>썸네일 첨부<input id="form-img" type="file" accept="image/*"></label>
       <label>출시일<input id="form-date" type="date" required></label>
       <label>테마 분류<input id="form-theme01" required maxlength="20"></label>
@@ -124,6 +176,25 @@
     </form>
   </div>
   <script>
+    const categoryList = [
+      { name: "", icon: { ac: "ac_all.png", de: "de_all.png" } },
+      { name: "헤어", icon: { ac: "ac_hair.png", de: "de_hair.png" } },
+      { name: "상하의", icon: { ac: "ac_clothes.png", de: "de_clothes.png" } },
+      { name: "남옷", icon: { ac: "ac_boy.png", de: "de_boy.png" } },
+      { name: "여옷", icon: { ac: "ac_girl.png", de: "de_girl.png" } },
+      { name: "겉옷", icon: { ac: "ac_outer.png", de: "de_outer.png" } },
+      { name: "신발", icon: { ac: "ac_shoes.png", de: "de_shoes.png" } },
+      { name: "모자", icon: { ac: "ac_hat.png", de: "de_hat.png" } },
+      { name: "리본", icon: { ac: "ac_ribbon.png", de: "de_ribbon.png" } },
+      { name: "안경", icon: { ac: "ac_glasses.png", de: "de_glasses.png" } },
+      { name: "왼손", icon: { ac: "ac_left.png", de: "de_left.png" } },
+      { name: "오른손", icon: { ac: "ac_right.png", de: "de_right.png" } },
+      { name: "몸통", icon: { ac: "ac_body.png", de: "de_body.png" } },
+      { name: "아우라", icon: { ac: "ac_aura.png", de: "de_aura.png" } }
+    ];
+    const CATEGORY_ICON_BASE = "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/";
+    let selectedCategory = "";
+
     // Supabase 설정
     const SUPABASE_URL = "https://vifigigmfjtiuoixzdyj.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpZmlnaWdtZmp0aXVvaXh6ZHlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMzNTAyMzcsImV4cCI6MjA2ODkyNjIzN30.ZSq1WJWaSSqQF1dhX2QtDAJ2il4-MmRaHac21l_JYAU";
@@ -177,6 +248,7 @@
       if (error) { cardList.innerHTML = "불러오기 실패: " + error.message; return; }
       allItems = data;
       setFilters();
+      renderCategoryTabs();
       drawCards();
     }
 
@@ -190,6 +262,23 @@
       adminFilterTheme.innerHTML = filterTheme.innerHTML;
     }
 
+    function renderCategoryTabs() {
+      const el = document.getElementById('category-tabs');
+      el.innerHTML = "";
+      categoryList.forEach(cat => {
+        const btn = document.createElement("button");
+        btn.className = "cat-btn" + (selectedCategory === cat.name ? " selected" : "");
+        btn.setAttribute("data-cat", cat.name);
+        btn.innerHTML = `<img src="${CATEGORY_ICON_BASE + (selectedCategory === cat.name ? cat.icon.ac : cat.icon.de)}" alt="${cat.name || "전체"}">`;
+        btn.onclick = () => {
+          selectedCategory = cat.name;
+          renderCategoryTabs();
+          drawCards();
+        };
+        el.appendChild(btn);
+      });
+    }
+
     // --- 카드 목록 그리기 ---
     function drawCards() {
       // 일반/관리자 모드 필터
@@ -200,6 +289,7 @@
       if (keyword) items = items.filter(x=>x.title && x.title.includes(keyword));
       if (year) items = items.filter(x=>x.date && x.date.startsWith(year));
       if (theme) items = items.filter(x=>x.theme01 === theme);
+      if (selectedCategory) items = items.filter(x=>x.category === selectedCategory);
 
       cardList.innerHTML = "";
       if (!items.length) {
@@ -258,6 +348,7 @@
     const formTitle = document.getElementById("form-title");
     const formQty = document.getElementById("form-qty");
     const formGrade = document.getElementById("form-grade");
+    const formCategory = document.getElementById("form-category");
     const formImg = document.getElementById("form-img");
     const formDate = document.getElementById("form-date");
     const formTheme01 = document.getElementById("form-theme01");
@@ -272,6 +363,7 @@
       formTitle.value = item?.title || "";
       formQty.value = item?.quantity || "";
       formGrade.value = item?.grade || "";
+      formCategory.value = item?.category || "";
       formImg.value = "";
       formDate.value = item?.date || "";
       formTheme01.value = item?.theme01 || "";
@@ -292,6 +384,7 @@
       const title = formTitle.value.trim();
       const quantity = Number(formQty.value);
       const grade = formGrade.value;
+      const category = formCategory.value;
       const date = formDate.value;
       const theme01 = formTheme01.value.trim();
       const theme02 = formTheme02.value.trim();
@@ -307,13 +400,13 @@
       }
       if (adminEditId) {
         // 수정
-        const updateObj = { title, quantity, grade, date, theme01, theme02 };
+        const updateObj = { title, quantity, grade, category, date, theme01, theme02 };
         if (thumbnail) updateObj.thumbnail = thumbnail;
         await supabase.from(TABLE).update(updateObj).eq("id", adminEditId);
         closePopup(); loadItems();
       } else {
         if (!thumbnail) return alert("이미지는 첨부 필수!");
-        await supabase.from(TABLE).insert([{ title, quantity, grade, thumbnail, date, theme01, theme02 }]);
+        await supabase.from(TABLE).insert([{ title, quantity, grade, category, thumbnail, date, theme01, theme02 }]);
         closePopup(); loadItems();
       }
     };
