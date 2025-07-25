@@ -48,9 +48,9 @@
       padding: 1.2em 1.2em 0.5em;
       background: #fff;
       border-bottom: 1px solid #f1f3f9;
-      position: sticky;
+      /* position: sticky;
       top: 0;
-      z-index: 99;
+      z-index: 99; */
     }
     .top-bar-filters {
       display: flex;
@@ -90,9 +90,29 @@
     .admin-bar.active {display:flex;}
     .admin-bar .filter-group {display:flex; gap:0.8em;}
     .admin-bar .admin-add-btn {background:#ffe066; color:#765c01;}
-    /* 팝업 */
-    .popup-bg {display:none;position:fixed;z-index:10;left:0;top:0;width:100vw;height:100vh;background:#2227;}
-    .popup-box {display:none;position:fixed;z-index:11;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border-radius:1.3em;box-shadow:0 4px 24px #0004;padding:2.2em 2em 1.2em;min-width:320px;max-width:90vw;}
+    /* 팝업 및 필터 팝업 */
+    .popup-bg,
+    #filter-popup-bg {
+      display: none;
+      position: fixed;
+      z-index: 200 !important;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: #2227;
+    }
+    .popup-box,
+    #filter-popup-box {
+      display: none;
+      position: fixed;
+      z-index: 210 !important;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border-radius: 1.3em;
+      box-shadow: 0 4px 24px #0004;
+      padding: 2.2em 2em 1.2em;
+      min-width: 320px;
+      max-width: 90vw;
+    }
     .popup-box label {
       display: block;
       margin-top: 0.65em;
@@ -552,19 +572,21 @@
             <input id="filter-popup-theme2-search" type="text" placeholder="테마명 입력" style="flex:1;" value="${themeKeywordBuffer.replace(/"/g,'&quot;')}">
             <button id="filter-popup-theme2-search-btn" type="button" style="padding:0.52em 1.2em;border-radius:0.7em;background:#a6aefc;color:#1a237e;border:none;cursor:pointer;font-size:0.96em;font-family:'Freesentation6','Noto Sans KR',sans-serif;">검색</button>
           </div>
-          <div id="filter-popup-theme2-list" style="margin-top:0.5em;max-height:140px;overflow-y:auto;border:1px solid #e3e6ef;border-radius:0.8em;padding:0.7em 0.5em 0.7em 0.5em;display:flex;flex-wrap:wrap;gap:0.13em 0.1em;">
-            ${
-              (
-                (integratedFilter.themeKeyword && integratedFilter.themeKeyword.trim().length > 0)
-                  ? allThemes2.filter(t2=>t2 && t2.includes(integratedFilter.themeKeyword))
-                  : allThemes2
-              ).map(t2=>`
-                <button type="button"
-                  class="filter-chip filter-popup-theme2${integratedFilter.themes2 && integratedFilter.themes2.includes(t2) ? " selected" : ""}"
-                  data-value="${t2.replace(/"/g,'&quot;')}"
-                >${t2}</button>
-              `).join("")
-            }
+          <div id="theme2-list-container" style="display:none;">
+            <div id="filter-popup-theme2-list" style="margin-top:0.5em;max-height:140px;overflow-y:auto;border:1px solid #e3e6ef;border-radius:0.8em;padding:0.7em 0.5em 0.7em 0.5em;display:flex;flex-wrap:wrap;gap:0.13em 0.1em;">
+              ${
+                (
+                  (integratedFilter.themeKeyword && integratedFilter.themeKeyword.trim().length > 0)
+                    ? allThemes2.filter(t2=>t2 && t2.includes(integratedFilter.themeKeyword))
+                    : allThemes2
+                ).map(t2=>`
+                  <button type="button"
+                    class="filter-chip filter-popup-theme2${integratedFilter.themes2 && integratedFilter.themes2.includes(t2) ? " selected" : ""}"
+                    data-value="${t2.replace(/"/g,'&quot;')}"
+                  >${t2}</button>
+                `).join("")
+              }
+            </div>
           </div>
         </div>
         <div class="popup-btns" style="margin-top:2em;text-align:center;">
@@ -605,37 +627,107 @@
         };
       });
       // (2) 테마명(theme02) chips
-      filterPopupBox.querySelectorAll(".filter-popup-theme2").forEach(btn=>{
-        btn.onclick = function() {
-          const val = btn.getAttribute("data-value");
-          if (!integratedFilter.themes2) integratedFilter.themes2 = [];
-          const idx = integratedFilter.themes2.indexOf(val);
-          if (idx === -1) {
-            integratedFilter.themes2.push(val);
-            btn.classList.add("selected");
-          } else {
-            integratedFilter.themes2.splice(idx, 1);
-            btn.classList.remove("selected");
-          }
-          renderFilterPopup();
-          updateFilterSelectedCount();
-        };
-      });
-      // (3) 테마명 검색 input/buffer
-      document.getElementById('filter-popup-theme2-search').oninput = function(e) {
-        themeKeywordBuffer = e.target.value;
-      };
-      // (4) 검색 버튼 및 엔터
-      document.getElementById('filter-popup-theme2-search-btn').onclick = function() {
+      // chips는 검색 버튼이 눌러져야만 보이므로, chips 이벤트는 chips가 그려질 때만 바인딩
+      const theme2ListContainer = filterPopupBox.querySelector("#theme2-list-container");
+      const theme2SearchInput = filterPopupBox.querySelector('#filter-popup-theme2-search');
+      const theme2SearchBtn = filterPopupBox.querySelector('#filter-popup-theme2-search-btn');
+      // chips 영역 숨김/노출 제어
+      let showTheme2Chips = false;
+      // chips 컨테이너를 항상 숨김으로 시작
+      theme2ListContainer.style.display = "none";
+      // chips 표시 함수
+      function showTheme2ChipsList() {
+        theme2ListContainer.style.display = "block";
+        // chips 클릭 이벤트 바인딩
+        filterPopupBox.querySelectorAll(".filter-popup-theme2").forEach(btn=>{
+          btn.onclick = function() {
+            const val = btn.getAttribute("data-value");
+            if (!integratedFilter.themes2) integratedFilter.themes2 = [];
+            const idx = integratedFilter.themes2.indexOf(val);
+            if (idx === -1) {
+              integratedFilter.themes2.push(val);
+              btn.classList.add("selected");
+            } else {
+              integratedFilter.themes2.splice(idx, 1);
+              btn.classList.remove("selected");
+            }
+            renderFilterPopup();
+            // chips가 다시 그려졌으므로, 다시 표시
+            setTimeout(() => {
+              const theme2ListContainerNew = document.getElementById("theme2-list-container");
+              if (theme2ListContainerNew) theme2ListContainerNew.style.display = "block";
+            }, 0);
+            updateFilterSelectedCount();
+          };
+        });
+      }
+      // 검색 버튼 클릭 시 chips 노출
+      theme2SearchBtn.onclick = function() {
         integratedFilter.themeKeyword = themeKeywordBuffer;
         renderFilterPopup();
+        setTimeout(() => {
+          const theme2ListContainerNew = document.getElementById("theme2-list-container");
+          if (theme2ListContainerNew) theme2ListContainerNew.style.display = "block";
+          // 바인딩
+          filterPopupBox.querySelectorAll(".filter-popup-theme2").forEach(btn=>{
+            btn.onclick = function() {
+              const val = btn.getAttribute("data-value");
+              if (!integratedFilter.themes2) integratedFilter.themes2 = [];
+              const idx = integratedFilter.themes2.indexOf(val);
+              if (idx === -1) {
+                integratedFilter.themes2.push(val);
+                btn.classList.add("selected");
+              } else {
+                integratedFilter.themes2.splice(idx, 1);
+                btn.classList.remove("selected");
+              }
+              renderFilterPopup();
+              setTimeout(() => {
+                const theme2ListContainerNew2 = document.getElementById("theme2-list-container");
+                if (theme2ListContainerNew2) theme2ListContainerNew2.style.display = "block";
+              }, 0);
+              updateFilterSelectedCount();
+            };
+          });
+        }, 0);
       };
-      document.getElementById('filter-popup-theme2-search').onkeydown = function(e) {
+      // 엔터도 검색과 동일하게 동작
+      theme2SearchInput.onkeydown = function(e) {
         if (e.key === "Enter") {
           e.preventDefault();
           integratedFilter.themeKeyword = themeKeywordBuffer;
           renderFilterPopup();
+          setTimeout(() => {
+            const theme2ListContainerNew = document.getElementById("theme2-list-container");
+            if (theme2ListContainerNew) theme2ListContainerNew.style.display = "block";
+            filterPopupBox.querySelectorAll(".filter-popup-theme2").forEach(btn=>{
+              btn.onclick = function() {
+                const val = btn.getAttribute("data-value");
+                if (!integratedFilter.themes2) integratedFilter.themes2 = [];
+                const idx = integratedFilter.themes2.indexOf(val);
+                if (idx === -1) {
+                  integratedFilter.themes2.push(val);
+                  btn.classList.add("selected");
+                } else {
+                  integratedFilter.themes2.splice(idx, 1);
+                  btn.classList.remove("selected");
+                }
+                renderFilterPopup();
+                setTimeout(() => {
+                  const theme2ListContainerNew2 = document.getElementById("theme2-list-container");
+                  if (theme2ListContainerNew2) theme2ListContainerNew2.style.display = "block";
+                }, 0);
+                updateFilterSelectedCount();
+              };
+            });
+          }, 0);
         }
+      };
+      // 입력값 변경 시 chips 숨김
+      theme2SearchInput.oninput = function(e) {
+        themeKeywordBuffer = e.target.value;
+        const theme2ListContainerNew = document.getElementById("theme2-list-container");
+        if (theme2ListContainerNew) theme2ListContainerNew.style.display = "none";
       };
       // 필터 적용
       document.getElementById("filter-popup-apply").onclick = function(e) {
