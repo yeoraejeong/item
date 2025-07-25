@@ -312,7 +312,7 @@
 
     // --- 데이터 불러오기/필터 ---
     async function loadItems() {
-      let { data, error } = await supabase.from(TABLE).select("*").order("id", { ascending: false });
+      let { data, error } = await supabase.from(TABLE).select("*").order("date", { ascending: false });
       if (error) { cardList.innerHTML = "불러오기 실패: " + error.message; return; }
       allItems = data;
       setFilters();
