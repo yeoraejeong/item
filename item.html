@@ -4,74 +4,34 @@
   <meta charset="UTF-8" />
   <title>포켓미니 아이템 전체 목록</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- ----- CSS 올인원 ----- -->
   <style>
     body { background: #f5f6fa; font-family: 'Noto Sans KR', sans-serif; margin:0; }
     .top-bar {
-      display: flex; flex-direction: column; align-items: flex-start;
-      gap: 0.4em; padding: 1.2em 1.2em 0.5em;
-      background: #fff; border-bottom: 1px solid #f1f3f9;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.4em;
+      padding: 1.2em 1.2em 0.5em;
+      background: #fff;
+      border-bottom: 1px solid #f1f3f9;
     }
     .top-bar-filters {
-      display: flex; gap: 0.8em; width: 100%; margin-top: 0.2em; align-items: center;
+      display: flex;
+      gap: 0.8em;
+      width: 100%;
+      margin-top: 0.2em;
+      align-items: center;
     }
     .top-bar input[type=password], .top-bar input[type=text] {padding:0.6em; border-radius:0.7em; border:1px solid #cbd3da; font-size:1em;}
     .top-bar select {padding:0.5em 0.8em; border-radius:0.7em; border:1.2px solid #dbe1ea; background:#f4f5fb;}
     .top-bar button {padding:0.65em 1.2em; border-radius:0.8em; background:#a6aefc; color:#1a237e; border:none; font-weight:bold; cursor:pointer;}
     .top-bar .admin-btn {background:#222; color:#fff;}
     .main {max-width:1120px; margin:2.5em auto 0; padding:0 1em;}
-    .admin-bar {display:none; justify-content:space-between; align-items:center; background:#fafbff; border-radius:1em; margin:1.5em 0 0.8em; padding:1.1em 2.5em 1em;}
-    .admin-bar.active {display:flex;}
-    .admin-bar .filter-group {display:flex; gap:0.8em;}
-    .admin-bar .admin-add-btn {background:#ffe066; color:#765c01;}
-    .category-tabs {
-      display: block;
-      white-space: nowrap;
-      overflow-x: auto;
-      max-width: 100vw;
-      margin-bottom: 1.1em;
-      background: none !important;
-      box-shadow: none !important;
-    }
-    .cat-btn {
-      display: inline-flex;
-      min-width: 34px;
-      flex: none;
-      justify-content: center;
-      border: none;
-      outline: none;
-      padding: 0.15em 0.11em 0.09em 0.11em;
-      flex-direction: column;
-      align-items: center;
-      font-size: 0.75em;
-      color: #555;
-      cursor: pointer;
-      border-radius: 1em;
-      margin-right: 0.03em;
-      background: none !important;
-      box-shadow: none !important;
-    }
-    .cat-btn.selected {
-      color: #fd47b4;
-      background: none !important;
-      box-shadow: none !important;
-    }
-    .cat-btn img {
-      height: 23px;
-      width: auto;
-      margin-bottom: 0.01em;
-      pointer-events: none;
-      filter: drop-shadow(0 1px 3px #fff) drop-shadow(0 0 4px #e8e8fa);
-      background: none !important;
-      box-shadow: none !important;
-    }
-    .main {max-width:1120px; margin:2.5em auto 0; padding:0 1em;}
     .card-list {display:flex; flex-wrap:wrap; gap:1.5em; margin-top:2.3em;}
     .item-card { background:#fff; border-radius:1.1em; box-shadow:0 2px 10px #0001; padding:0.6em; width:122px; min-height:164px; display:flex; flex-direction:column; align-items:center; position:relative;}
     .item-card .item-img {
       width: 100%;
-      aspect-ratio: 5/4;
+      aspect-ratio: 3/4;
       object-fit: cover;
       border-radius: 0.5em;
       margin-bottom: 0.4em;
@@ -79,11 +39,20 @@
       display: block;
       box-shadow:0 0 4px #0001;
     }
-    .item-card .item-qty { color:#555; font-size:0.89em; margin-bottom:0.5em;}
+    .item-card .badge { display:inline-block; font-weight:bold; font-size:0.98em; padding:0.19em 1.1em; border-radius:0.9em; margin-bottom:0.25em;}
+    .badge-sr { background:#fff6c1; color:#be9800;}
+    .badge-r { background:#ececec; color:#7d7d7d;}
+    .badge-n { background:#c8e6ff; color:#1976d2;}
+    .item-card .item-title { font-size:0.98em; font-weight:400; margin-bottom:0.13em; text-align:center;}
+    .item-card .item-qty { color:#555; font-size:0.98em; margin-bottom:0.5em;}
     .item-card .card-btns {display:flex; gap:0.5em;}
     .item-card .edit-btn, .item-card .del-btn { border:none; background:#ececec; border-radius:0.7em; padding:0.3em 0.95em; font-size:0.97em; cursor:pointer;}
     .item-card .edit-btn {background:#a6f1b7; color:#18713a;}
     .item-card .del-btn {background:#ffcccc; color:#ae2323;}
+    .admin-bar {display:none; justify-content:space-between; align-items:center; background:#fafbff; border-radius:1em; margin:1.5em 0 0.8em; padding:1.1em 2.5em 1em;}
+    .admin-bar.active {display:flex;}
+    .admin-bar .filter-group {display:flex; gap:0.8em;}
+    .admin-bar .admin-add-btn {background:#ffe066; color:#765c01;}
     /* 팝업 */
     .popup-bg {display:none;position:fixed;z-index:10;left:0;top:0;width:100vw;height:100vh;background:#2227;}
     .popup-box {display:none;position:fixed;z-index:11;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border-radius:1.3em;box-shadow:0 4px 24px #0004;padding:2.2em 2em 1.2em;min-width:320px;max-width:90vw;}
@@ -96,13 +65,13 @@
     /* 모바일 2열 */
     @media (max-width: 640px) {
       .main {padding:0;}
-      .card-list {gap:0.4em; flex-wrap: wrap;}
-      .item-card {width:28vw; min-width:70px;}
+      .card-list {gap:0.8em;}
+      .item-card {width:48vw; min-width:120px;}
       .admin-bar {padding:1.2em 1em;}
     }
   </style>
-  <!-- supabase js CDN -->
-  </head>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
 <body>
   <!-- 상단 로그인/필터 -->
   <div class="top-bar">
@@ -116,52 +85,8 @@
       <select id="filter-year"><option value="">연도</option></select>
       <select id="filter-theme01"><option value="">테마분류</option></select>
     </div>
-    <!-- 카테고리 탭: 아이콘만 한 줄, 가로 스크롤 -->
-    <div class="category-tabs">
-      <button class="cat-btn selected" data-cat="">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_all.png" alt="전체">
-      </button>
-      <button class="cat-btn" data-cat="헤어">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_hair.png" alt="헤어">
-      </button>
-      <button class="cat-btn" data-cat="상하의">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_clothes.png" alt="상하의">
-      </button>
-      <button class="cat-btn" data-cat="남옷">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_boy.png" alt="남옷">
-      </button>
-      <button class="cat-btn" data-cat="여옷">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_girl.png" alt="여옷">
-      </button>
-      <button class="cat-btn" data-cat="겉옷">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_outer.png" alt="겉옷">
-      </button>
-      <button class="cat-btn" data-cat="신발">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_shoes.png" alt="신발">
-      </button>
-      <button class="cat-btn" data-cat="모자">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_hat.png" alt="모자">
-      </button>
-      <button class="cat-btn" data-cat="리본">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_ribbon.png" alt="리본">
-      </button>
-      <button class="cat-btn" data-cat="안경">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_glasses.png" alt="안경">
-      </button>
-      <button class="cat-btn" data-cat="왼손">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_left.png" alt="왼손">
-      </button>
-      <button class="cat-btn" data-cat="오른손">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_right.png" alt="오른손">
-      </button>
-      <button class="cat-btn" data-cat="몸통">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_body.png" alt="몸통">
-      </button>
-      <button class="cat-btn" data-cat="아우라">
-        <img src="https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_aura.png" alt="아우라">
-      </button>
-    </div>
   </div>
+  <!-- 관리자만: 관리바 -->
   <div class="main">
     <div class="admin-bar" id="admin-bar">
       <div class="filter-group">
@@ -191,24 +116,6 @@
       <label>썸네일 첨부<input id="form-img" type="file" accept="image/*"></label>
       <label>출시일<input id="form-date" type="date" required></label>
       <label>테마 분류<input id="form-theme01" required maxlength="20"></label>
-      <label>카테고리
-        <select id="form-category" required>
-          <option value="">카테고리 선택</option>
-          <option>헤어</option>
-          <option>상하의</option>
-          <option>남옷</option>
-          <option>여옷</option>
-          <option>겉옷</option>
-          <option>신발</option>
-          <option>모자</option>
-          <option>리본</option>
-          <option>안경</option>
-          <option>왼손</option>
-          <option>오른손</option>
-          <option>몸통</option>
-          <option>아우라</option>
-        </select>
-      </label>
       <label>테마 이름<input id="form-theme02" required maxlength="20"></label>
       <div class="popup-btns">
         <button type="submit" class="popup-save">저장</button>
@@ -216,305 +123,203 @@
       </div>
     </form>
   </div>
-  <!-- ----- JS 올인원 ----- -->
   <script>
-    // 1. supabase 연결정보 (여기에 네 프로젝트 정보 복사해서 넣으면 됨!)
-    const supabaseUrl = 'https://vifigigmfjtiuoixzdyj.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpZmlnaWdtZmp0aXVvaXh6ZHlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMzNTAyMzcsImV4cCI6MjA2ODkyNjIzN30.ZSq1WJWaSSqQF1dhX2QtDAJ2il4-MmRaHac21l_JYAU';
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-    // 2. 상태 전역변수
-    let items = [];
+    // Supabase 설정
+    const SUPABASE_URL = "https://vifigigmfjtiuoixzdyj.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpZmlnaWdtZmp0aXVvaXh6ZHlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMzNTAyMzcsImV4cCI6MjA2ODkyNjIzN30.ZSq1WJWaSSqQF1dhX2QtDAJ2il4-MmRaHac21l_JYAU";
+    const BUCKET = "item-images";
+    const TABLE = "items";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // --- 상태 변수 ---
     let isAdmin = false;
-    let selectedCategory = "";
-    // 3. 카테고리 아이콘 매핑
-    const iconMap = {
-      "": {
-        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_all.png",
-        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_all.png"
-      },
-      "헤어": {
-        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_hair.png",
-        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_hair.png"
-      },
-      "상하의": {
-        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_clothes.png",
-        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_clothes.png"
-      },
-      "남옷": {
-        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_boy.png",
-        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_boy.png"
-      },
-      "여옷": {
-        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_girl.png",
-        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_girl.png"
-      },
-      "겉옷": {
-        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_outer.png",
-        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_outer.png"
-      },
-      "신발": {
-        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_shoes.png",
-        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_shoes.png"
-      },
-      "모자": {
-        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_hat.png",
-        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_hat.png"
-      },
-      "리본": {
-        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_ribbon.png",
-        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_ribbon.png"
-      },
-      "안경": {
-        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_glasses.png",
-        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_glasses.png"
-      },
-      "왼손": {
-        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_left.png",
-        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_left.png"
-      },
-      "오른손": {
-        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_right.png",
-        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_right.png"
-      },
-      "몸통": {
-        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_body.png",
-        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_body.png"
-      },
-      "아우라": {
-        ac: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/ac_aura.png",
-        de: "https://vifigigmfjtiuoixzdyj.supabase.co/storage/v1/object/public/category-icons/de_aura.png"
-      }
-    };
+    let allItems = [];
+    let adminEditId = null;
 
-    // 4. 초기 데이터 불러오기
-    async function fetchItems() {
-      let { data, error } = await supabase.from('items').select('*').order('date', {ascending: false});
-      if (error) {
-        alert("불러오기 오류!"); return;
-      }
-      items = data || [];
-      drawCards();
-    }
+    // --- UI 이벤트 바인딩 ---
+    // const adminId = document.getElementById("admin-id"); // removed
+    const adminPw = document.getElementById("admin-pw");
+    const adminLoginBtn = document.getElementById("admin-login-btn");
+    const adminBar = document.getElementById("admin-bar");
+    const cardList = document.getElementById("card-list");
+    const searchKeyword = document.getElementById("search-keyword");
+    const filterYear = document.getElementById("filter-year");
+    const filterTheme = document.getElementById("filter-theme01");
+    // 관리자 필터
+    const adminSearch = document.getElementById("admin-search");
+    const adminFilterYear = document.getElementById("admin-filter-year");
+    const adminFilterTheme = document.getElementById("admin-filter-theme01");
 
-    // 5. 카드리스트 그리기
-    function drawCards({ category } = {}) {
-      let list = [...items];
-      // 검색
-      const keyword = (document.getElementById('search-keyword').value || "").trim();
-      if (keyword) list = list.filter(i => i.title && i.title.includes(keyword));
-      // 연도/테마분류
-      const year = document.getElementById('filter-year').value;
-      if (year) list = list.filter(i => (i.date||"").slice(0,4) === year);
-      const theme01 = document.getElementById('filter-theme01').value;
-      if (theme01) list = list.filter(i => i.theme01 === theme01);
-      // 카테고리
-      const cat = (category !== undefined ? category : selectedCategory);
-      if (cat) list = list.filter(i => i.category === cat);
-      selectedCategory = cat || "";
-
-      // 카드 생성
-      const cardList = document.getElementById('card-list');
-      cardList.innerHTML = '';
-      if (!list.length) {
-        cardList.innerHTML = '<div style="margin:3em auto;color:#888;">등록된 아이템이 없습니다.</div>';
+    // --- 로그인/권한 로직 ---
+    // 아이디 입력란 제거, 32f6c7은 상단에 고정
+    adminLoginBtn.onclick = () => {
+      if (isAdmin) {
+        isAdmin = false;
+        adminLoginBtn.textContent = "관리자모드";
+        adminBar.classList.remove("active");
+        loadItems();
         return;
       }
-      list.forEach(item => {
-        // 카드 만들기
-        const card = document.createElement('div');
-        card.className = 'item-card';
-
-        // 썸네일
-        const img = document.createElement('img');
-        img.className = 'item-img';
-        img.src = item.thumbnail || 'https://via.placeholder.com/120x160.png?text=No+Image';
-        img.alt = '';
-        card.appendChild(img);
-
-        // 수량
-        const qty = document.createElement('div');
-        qty.className = 'item-qty';
-        qty.textContent = `수량: ${item.quantity ?? '-'}`;
-        card.appendChild(qty);
-
-        // 관리자: 수정/삭제 버튼
-        if (isAdmin) {
-          const btns = document.createElement('div');
-          btns.className = 'card-btns';
-
-          const editBtn = document.createElement('button');
-          editBtn.className = 'edit-btn';
-          editBtn.textContent = '수정';
-          editBtn.onclick = () => openPopup('edit', item);
-          btns.appendChild(editBtn);
-
-          const delBtn = document.createElement('button');
-          delBtn.className = 'del-btn';
-          delBtn.textContent = '삭제';
-          delBtn.onclick = () => deleteItem(item.id);
-          btns.appendChild(delBtn);
-
-          card.appendChild(btns);
-        }
-
-        cardList.appendChild(card);
-      });
-    }
-
-    // 6. 필터(카테고리)
-    document.addEventListener("DOMContentLoaded", function() {
-      const btns = document.querySelectorAll('.cat-btn');
-      btns.forEach(b => {
-        const cat = b.getAttribute('data-cat');
-        const img = b.querySelector('img');
-        if (cat === "") {
-          b.classList.add('selected');
-          if (iconMap[""]) img.src = iconMap[""].ac;
-        } else {
-          b.classList.remove('selected');
-          if (iconMap[cat]) img.src = iconMap[cat].de;
-        }
-      });
-      btns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          btns.forEach(b => {
-            b.classList.remove('selected');
-            const cat = b.getAttribute('data-cat');
-            const img = b.querySelector('img');
-            if (iconMap[cat]) img.src = iconMap[cat].de;
-          });
-          btn.classList.add('selected');
-          const cat = btn.getAttribute('data-cat');
-          const img = btn.querySelector('img');
-          if (iconMap[cat]) img.src = iconMap[cat].ac;
-          filterCategory(cat);
-        });
-      });
-      filterCategory("");
-    });
-
-    function filterCategory(cat) { drawCards({category:cat}); }
-
-    // 7. 필터(검색/연도/테마)
-    document.getElementById('search-keyword').addEventListener('input', ()=>drawCards());
-    document.getElementById('filter-year').addEventListener('change', ()=>drawCards());
-    document.getElementById('filter-theme01').addEventListener('change', ()=>drawCards());
-
-    // 8. 관리자모드
-    document.getElementById('admin-login-btn').onclick = function() {
-      const pw = document.getElementById('admin-pw').value.trim();
-      if (pw === 'wjddufo1!') {
+      // 아이디는 "32f6c7"로 고정
+      if (adminPw.value === "wjddufo1!") {
         isAdmin = true;
-        document.getElementById('admin-bar').classList.add('active');
-        drawCards();
+        adminBar.classList.add("active");
+        adminLoginBtn.textContent = "관리자모드 해제";
+        loadItems();
       } else {
-        alert("비밀번호가 틀렸습니다!");
+        alert("비밀번호가 틀렸습니다.");
       }
     };
 
-    // 9. 팝업(추가/수정)
-    function openPopup(mode, item={}) {
-      document.getElementById('popup-bg').style.display = 'block';
-      document.getElementById('popup-box').style.display = 'block';
-      document.getElementById('popup-title').textContent = mode==='add'?'아이템 추가':'아이템 수정';
-      document.getElementById('form-title').value = item.title || '';
-      document.getElementById('form-qty').value = item.quantity || '';
-      document.getElementById('form-grade').value = item.grade || '';
-      document.getElementById('form-img').value = '';
-      document.getElementById('form-date').value = item.date || '';
-      document.getElementById('form-theme01').value = item.theme01 || '';
-      document.getElementById('form-theme02').value = item.theme02 || '';
-      document.getElementById('form-category').value = item.category || '';
-      document.getElementById('popup-form').onsubmit = async function(e) {
-        e.preventDefault();
-        await saveItem(mode, item.id);
-      }
+    // --- 데이터 불러오기/필터 ---
+    async function loadItems() {
+      let { data, error } = await supabase.from(TABLE).select("*").order("id", { ascending: false });
+      if (error) { cardList.innerHTML = "불러오기 실패: " + error.message; return; }
+      allItems = data;
+      setFilters();
+      drawCards();
     }
-    document.getElementById('popup-cancel').onclick = function() {
-      document.getElementById('popup-bg').style.display = 'none';
-      document.getElementById('popup-box').style.display = 'none';
+
+    function setFilters() {
+      // 연도/테마 옵션 동적 생성
+      const years = [...new Set(allItems.map(x=>x.date?x.date.substr(0,4):"").filter(x=>x))];
+      const themes = [...new Set(allItems.map(x=>x.theme01).filter(x=>x))];
+      filterYear.innerHTML = '<option value="">연도</option>' + years.map(y=>`<option>${y}</option>`).join("");
+      filterTheme.innerHTML = '<option value="">테마분류</option>' + themes.map(t=>`<option>${t}</option>`).join("");
+      adminFilterYear.innerHTML = filterYear.innerHTML;
+      adminFilterTheme.innerHTML = filterTheme.innerHTML;
+    }
+
+    // --- 카드 목록 그리기 ---
+    function drawCards() {
+      // 일반/관리자 모드 필터
+      const keyword = (isAdmin ? adminSearch.value : searchKeyword.value).trim();
+      const year = (isAdmin ? adminFilterYear.value : filterYear.value);
+      const theme = (isAdmin ? adminFilterTheme.value : filterTheme.value);
+      let items = allItems;
+      if (keyword) items = items.filter(x=>x.title && x.title.includes(keyword));
+      if (year) items = items.filter(x=>x.date && x.date.startsWith(year));
+      if (theme) items = items.filter(x=>x.theme01 === theme);
+
+      cardList.innerHTML = "";
+      if (!items.length) {
+        cardList.innerHTML = `<div style="text-align:center;margin:3em 0;color:#888;">아이템이 없습니다.</div>`;
+        return;
+      }
+      items.forEach(item => {
+        const badgeClass = item.grade === "SR" ? "badge-sr" : item.grade === "R" ? "badge-r" : "badge-n";
+        cardList.innerHTML += `
+          <div class="item-card" style="background:${item.grade === "SR" ? '#fffdea':item.grade==="R"?'#f6f6f6':'#f2f9ff'}">
+            <img class="item-img" src="${item.thumbnail||''}" alt="썸네일">
+            <div class="item-title">${item.title||''}</div>
+            <div class="item-qty">수량 : <b>${item.quantity||''}</b></div>
+            ${isAdmin ? `
+            <div class="card-btns">
+              <button class="edit-btn" data-id="${item.id}">수정</button>
+              <button class="del-btn" data-id="${item.id}">삭제</button>
+            </div>` : ""}
+          </div>
+        `;
+      });
+    }
+
+    // --- 카드 필터 이벤트 ---
+    searchKeyword.oninput = drawCards;
+    filterYear.onchange = drawCards;
+    filterTheme.onchange = drawCards;
+    adminSearch.oninput = drawCards;
+    adminFilterYear.onchange = drawCards;
+    adminFilterTheme.onchange = drawCards;
+
+    // --- 카드 수정/삭제 ---
+    cardList.onclick = e => {
+      const editBtn = e.target.closest(".edit-btn");
+      const delBtn = e.target.closest(".del-btn");
+      if (editBtn) {
+        const id = editBtn.dataset.id;
+        openPopup("수정", allItems.find(x=>x.id==id));
+      }
+      if (delBtn) {
+        const id = delBtn.dataset.id;
+        if (confirm("정말 삭제할까요?")) deleteItem(id);
+      }
     };
 
-    // 10. 아이템 추가/수정
-    async function saveItem(mode, id) {
-      const title = document.getElementById('form-title').value.trim();
-      const quantity = +document.getElementById('form-qty').value;
-      const grade = document.getElementById('form-grade').value;
-      const date = document.getElementById('form-date').value;
-      const theme01 = document.getElementById('form-theme01').value.trim();
-      const theme02 = document.getElementById('form-theme02').value.trim();
-      const category = document.getElementById('form-category').value;
-      // 썸네일 업로드
-      let thumbnail = null;
-      const fileInput = document.getElementById('form-img');
-      if (fileInput.files[0]) {
-        const file = fileInput.files[0];
-        const filename = `${Date.now()}_${Math.random().toString(36).slice(2,10)}.${file.name.split('.').pop()}`;
-        let { error:upErr } = await supabase.storage.from('item-images').upload(filename, file);
-        if (!upErr)
-          thumbnail = `${supabaseUrl}/storage/v1/object/public/item-images/${filename}`;
-      }
-      // 기존값 유지
-      if (mode==='edit') {
-        const existing = items.find(i=>i.id===id);
-        if (!thumbnail) thumbnail = existing?.thumbnail;
-      }
-      // 저장
-      let body = { title, quantity, grade, date, theme01, theme02, category, thumbnail };
-      if (mode==='add') {
-        let { error } = await supabase.from('items').insert([body]);
-        if (error) return alert('저장 오류!');
-      } else {
-        let { error } = await supabase.from('items').update(body).eq('id',id);
-        if (error) return alert('수정 오류!');
-      }
-      document.getElementById('popup-bg').style.display = 'none';
-      document.getElementById('popup-box').style.display = 'none';
-      fetchItems();
-    }
-
-    // 11. 아이템 삭제
     async function deleteItem(id) {
-      if (!confirm('정말 삭제할까요?')) return;
-      let { error } = await supabase.from('items').delete().eq('id',id);
-      if (error) return alert('삭제 오류!');
-      fetchItems();
+      await supabase.from(TABLE).delete().eq("id", id);
+      loadItems();
     }
 
-    // 12. 관리자 추가 버튼
-    document.getElementById('admin-add-btn').onclick = ()=>openPopup('add');
+    // --- 아이템 추가/수정 팝업 ---
+    const popupBg = document.getElementById("popup-bg");
+    const popupBox = document.getElementById("popup-box");
+    const popupForm = document.getElementById("popup-form");
+    const popupTitle = document.getElementById("popup-title");
+    const formTitle = document.getElementById("form-title");
+    const formQty = document.getElementById("form-qty");
+    const formGrade = document.getElementById("form-grade");
+    const formImg = document.getElementById("form-img");
+    const formDate = document.getElementById("form-date");
+    const formTheme01 = document.getElementById("form-theme01");
+    const formTheme02 = document.getElementById("form-theme02");
 
-    // 13. 연도/테마 분류 자동 채우기 (필터 select)
-    function setFilterOptions() {
-      const years = [...new Set(items.map(i=>(i.date||"").slice(0,4)).filter(Boolean))].sort().reverse();
-      const ysel = document.getElementById('filter-year');
-      ysel.innerHTML = '<option value="">연도</option>' + years.map(y=>`<option>${y}</option>`).join('');
-      const themes = [...new Set(items.map(i=>i.theme01).filter(Boolean))].sort();
-      const tsel = document.getElementById('filter-theme01');
-      tsel.innerHTML = '<option value="">테마분류</option>' + themes.map(t=>`<option>${t}</option>`).join('');
-      // 관리자 필터도 동일하게
-      const ysel2 = document.getElementById('admin-filter-year');
-      ysel2.innerHTML = '<option value="">연도</option>' + years.map(y=>`<option>${y}</option>`).join('');
-      const tsel2 = document.getElementById('admin-filter-theme01');
-      tsel2.innerHTML = '<option value="">테마분류</option>' + themes.map(t=>`<option>${t}</option>`).join('');
+    document.getElementById("admin-add-btn").onclick = () => openPopup("추가");
+    document.getElementById("popup-cancel").onclick = closePopup;
+
+    function openPopup(mode, item) {
+      popupBg.style.display = popupBox.style.display = "block";
+      popupTitle.textContent = mode === "수정" ? "아이템 수정" : "아이템 추가";
+      formTitle.value = item?.title || "";
+      formQty.value = item?.quantity || "";
+      formGrade.value = item?.grade || "";
+      formImg.value = "";
+      formDate.value = item?.date || "";
+      formTheme01.value = item?.theme01 || "";
+      formTheme02.value = item?.theme02 || "";
+      adminEditId = mode === "수정" ? item.id : null;
+    }
+    function closePopup() {
+      popupBg.style.display = popupBox.style.display = "none";
+      popupForm.reset();
+      adminEditId = null;
     }
 
-    // 14. 관리자 필터
-    document.getElementById('admin-search').addEventListener('input', function(){
-      drawCards();
-    });
-    document.getElementById('admin-filter-year').addEventListener('change', function(){
-      drawCards();
-    });
-    document.getElementById('admin-filter-theme01').addEventListener('change', function(){
-      drawCards();
-    });
+    popupBg.onclick = closePopup;
 
-    // 15. 최초 실행
-    window.onload = async function() {
-      await fetchItems();
-      setFilterOptions();
+    popupForm.onsubmit = async e => {
+      e.preventDefault();
+      // 필드 읽기
+      const title = formTitle.value.trim();
+      const quantity = Number(formQty.value);
+      const grade = formGrade.value;
+      const date = formDate.value;
+      const theme01 = formTheme01.value.trim();
+      const theme02 = formTheme02.value.trim();
+      let thumbnail = null;
+      if (formImg.files.length) {
+        // 업로드
+        const file = formImg.files[0];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${fileExt}`;
+        const { error } = await supabase.storage.from(BUCKET).upload(fileName, file, { upsert: true });
+        if (error) return alert("이미지 업로드 실패: "+error.message);
+        thumbnail = supabase.storage.from(BUCKET).getPublicUrl(fileName).data.publicUrl;
+      }
+      if (adminEditId) {
+        // 수정
+        const updateObj = { title, quantity, grade, date, theme01, theme02 };
+        if (thumbnail) updateObj.thumbnail = thumbnail;
+        await supabase.from(TABLE).update(updateObj).eq("id", adminEditId);
+        closePopup(); loadItems();
+      } else {
+        if (!thumbnail) return alert("이미지는 첨부 필수!");
+        await supabase.from(TABLE).insert([{ title, quantity, grade, thumbnail, date, theme01, theme02 }]);
+        closePopup(); loadItems();
+      }
     };
+
+    // --- 최초 렌더 ---
+    loadItems();
   </script>
 </body>
 </html>
