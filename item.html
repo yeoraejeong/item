@@ -33,6 +33,9 @@
       padding: 1.2em 1.2em 0.5em;
       background: #fff;
       border-bottom: 1px solid #f1f3f9;
+      position: sticky;
+      top: 0;
+      z-index: 99;
     }
     .top-bar-filters {
       display: flex;
@@ -82,10 +85,10 @@
     .popup-box .popup-save{background:#a6f1b7;color:#18713a;margin-right:0.8em;}
     .popup-box .popup-cancel{background:#ececec;color:#7d7d7d;}
     /* 모바일 2열 */
-    @media (max-width: 600px) {
+    @media (max-width: 640px) {
       .main {padding:0;}
-      .card-list {gap:0.8em;}
-      .item-card {width:27vw; min-width:55px;}
+      .card-list {gap:3%;}
+      .item-card {width: 30%; min-width: 30px; max-width: 200px;}
       .admin-bar {padding:1.2em 1em;}
     }
     /* category-tabs */
@@ -100,6 +103,8 @@
       background: none !important;
       overscroll-behavior-x: contain;
       scroll-behavior: smooth;
+      width: 100vw;
+      overflow-x: auto !important;
     }
     .category-tabs::-webkit-scrollbar {
       display: none !important;
