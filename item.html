@@ -176,8 +176,8 @@
     </div>
     <div class="top-bar-filters">
       <input id="search-keyword" type="text" placeholder="템 이름 검색" style="min-width:220px;flex:2;">
-      <select id="filter-year"><option value="">연도</option></select>
-      <select id="filter-theme01"><option value="">테마분류</option></select>
+      <button id="filter-integrated-btn" style="padding:0.65em 1.2em; border-radius:0.8em; background:#e2e8fc; color:#1a237e; border:none; cursor:pointer; font-size:1em;">통합 필터</button>
+      <span id="filter-selected-count" style="font-size:0.92em; color:#5c5c5c; margin-left:0.7em;"></span>
     </div>
     <div class="category-tabs" id="category-tabs"></div>
   </div>
@@ -287,8 +287,9 @@
     const adminBar = document.getElementById("admin-bar");
     const cardList = document.getElementById("card-list");
     const searchKeyword = document.getElementById("search-keyword");
-    const filterYear = document.getElementById("filter-year");
-    const filterTheme = document.getElementById("filter-theme01");
+    // 통합 필터 버튼 및 선택 카운트
+    const filterIntegratedBtn = document.getElementById("filter-integrated-btn");
+    const filterSelectedCount = document.getElementById("filter-selected-count");
     // 관리자 필터
     const adminSearch = document.getElementById("admin-search");
     const adminFilterYear = document.getElementById("admin-filter-year");
@@ -326,14 +327,28 @@
       showLastModified();
     }
 
+    // -------- 통합 필터 상태 및 팝업 --------
+    // 필터 상태
+    let integratedFilter = {
+      years: [],
+      themes: [],
+      themeKeyword: "",
+    };
+    // 연도/테마 전체 목록
+    let allYears = [];
+    let allThemes = [];
+
     function setFilters() {
-      // 연도/테마 옵션 동적 생성
+      // 연도/테마 옵션 동적 생성 (관리자 select용)
       const years = [...new Set(allItems.map(x=>x.date?x.date.substr(0,4):"").filter(x=>x))];
       const themes = [...new Set(allItems.map(x=>x.theme01).filter(x=>x))];
-      filterYear.innerHTML = '<option value="">연도</option>' + years.map(y=>`<option>${y}</option>`).join("");
-      filterTheme.innerHTML = '<option value="">테마분류</option>' + themes.map(t=>`<option>${t}</option>`).join("");
-      adminFilterYear.innerHTML = filterYear.innerHTML;
-      adminFilterTheme.innerHTML = filterTheme.innerHTML;
+      adminFilterYear.innerHTML = '<option value="">연도</option>' + years.map(y=>`<option>${y}</option>`).join("");
+      adminFilterTheme.innerHTML = '<option value="">테마분류</option>' + themes.map(t=>`<option>${t}</option>`).join("");
+      // 통합 필터용 전체 목록 저장 (연도는 2015~2025 고정)
+      allYears = [];
+      for (let y = 2015; y <= 2025; ++y) allYears.push(String(y));
+      allThemes = themes.slice();
+      updateFilterSelectedCount();
     }
 
     function renderCategoryTabs() {
@@ -357,12 +372,31 @@
     function drawCards() {
       // 일반/관리자 모드 필터
       const keyword = (isAdmin ? adminSearch.value : searchKeyword.value).trim();
-      const year = (isAdmin ? adminFilterYear.value : filterYear.value);
-      const theme = (isAdmin ? adminFilterTheme.value : filterTheme.value);
       let items = allItems;
+      // 통합 필터 (일반 모드)
+      if (!isAdmin) {
+        // 연도 필터
+        if (integratedFilter.years.length > 0) {
+          items = items.filter(x => x.date && integratedFilter.years.includes(x.date.substr(0, 4)));
+        }
+        // 테마 필터
+        if (integratedFilter.themes.length > 0) {
+          items = items.filter(x => x.theme01 && integratedFilter.themes.includes(x.theme01));
+        }
+        // 테마명 키워드 필터
+        if (integratedFilter.themeKeyword.trim().length > 0) {
+          items = items.filter(x => x.theme01 && x.theme01.includes(integratedFilter.themeKeyword));
+        }
+      }
+      // 기존 검색어
       if (keyword) items = items.filter(x=>x.title && x.title.includes(keyword));
-      if (year) items = items.filter(x=>x.date && x.date.startsWith(year));
-      if (theme) items = items.filter(x=>x.theme01 === theme);
+      // 관리자 모드 select 필터
+      if (isAdmin) {
+        const year = adminFilterYear.value;
+        const theme = adminFilterTheme.value;
+        if (year) items = items.filter(x=>x.date && x.date.startsWith(year));
+        if (theme) items = items.filter(x=>x.theme01 === theme);
+      }
       if (selectedCategory) items = items.filter(x=>x.category === selectedCategory);
 
       cardList.innerHTML = "";
@@ -389,11 +423,132 @@
 
     // --- 카드 필터 이벤트 ---
     searchKeyword.oninput = drawCards;
-    filterYear.onchange = drawCards;
-    filterTheme.onchange = drawCards;
+    // filterYear, filterTheme 제거됨 (통합 필터로 대체)
     adminSearch.oninput = drawCards;
     adminFilterYear.onchange = drawCards;
     adminFilterTheme.onchange = drawCards;
+    // ----------- 통합 필터 팝업 UI -----------
+    // 팝업 배경/박스 생성 (스타일은 popup-bg/popup-box와 동일하게)
+    let filterPopupBg = document.createElement('div');
+    filterPopupBg.id = "filter-popup-bg";
+    filterPopupBg.className = "popup-bg";
+    filterPopupBg.style.display = "none";
+    document.body.appendChild(filterPopupBg);
+    let filterPopupBox = document.createElement('div');
+    filterPopupBox.id = "filter-popup-box";
+    filterPopupBox.className = "popup-box";
+    filterPopupBox.style.display = "none";
+    document.body.appendChild(filterPopupBox);
+
+    // 팝업 열기
+    filterIntegratedBtn.onclick = function() {
+      renderFilterPopup();
+      filterPopupBg.style.display = filterPopupBox.style.display = "block";
+      // 포커스 테마명 검색 input
+      setTimeout(() => {
+        let inp = document.getElementById("filter-popup-theme-search");
+        if (inp) inp.focus();
+      }, 80);
+    };
+    // 팝업 닫기
+    filterPopupBg.onclick = function() {
+      filterPopupBg.style.display = filterPopupBox.style.display = "none";
+    };
+
+    function renderFilterPopup() {
+      // 연도/테마 체크박스, 테마명 검색 input
+      // 테마는 allThemes 기준, 테마명 키워드로 필터
+      const themeKeyword = integratedFilter.themeKeyword || "";
+      let filteredThemes = allThemes;
+      if (themeKeyword.trim().length > 0) {
+        filteredThemes = allThemes.filter(t=>t && t.includes(themeKeyword));
+      }
+      // 팝업 HTML
+      filterPopupBox.innerHTML = `
+        <h2 class="popup-title" style="margin:0 0 1em;font-size:1.13em;">통합 필터</h2>
+        <div>
+          <label style="margin-bottom:0.2em;font-size:1em;">연도</label>
+          <div style="max-height:120px;overflow-y:auto;border:1px solid #e3e6ef;border-radius:0.8em;padding:0.7em 0.9em 0.7em 0.9em;display:flex;flex-wrap:wrap;gap:0.85em 1.4em;">
+            ${allYears.map(y=>`
+              <label style="margin-bottom:0;margin-right:0.5em;display:inline-flex;align-items:center;font-size:1em;">
+                <input type="checkbox" class="filter-popup-year" value="${y}" ${integratedFilter.years.includes(y)?"checked":""} style="margin-right:0.5em;">${y}
+              </label>
+            `).join("")}
+          </div>
+        </div>
+        <div style="margin-top:1.25em;">
+          <label style="margin-bottom:0.2em;font-size:1em;">테마분류</label>
+          <input id="filter-popup-theme-search" type="text" placeholder="테마 이름(테마명) 검색" value="${themeKeyword.replace(/"/g,'&quot;')}" style="width:100%;margin-bottom:0.5em;padding:0.55em 0.8em;font-size:1em;border-radius:0.7em;border:1px solid #cbd3da;">
+          <div style="max-height:150px;overflow-y:auto;border:1px solid #e3e6ef;border-radius:0.8em;padding:0.7em 0.9em 0.7em 0.9em;display:flex;flex-wrap:wrap;gap:0.85em 1.4em;">
+            ${filteredThemes.map(t=>`
+              <label style="margin-bottom:0;margin-right:0.5em;display:inline-flex;align-items:center;font-size:1em;">
+                <input type="checkbox" class="filter-popup-theme" value="${t.replace(/"/g,'&quot;')}" ${integratedFilter.themes.includes(t)?"checked":""} style="margin-right:0.5em;">${t}
+              </label>
+            `).join("")}
+          </div>
+        </div>
+        <div class="popup-btns" style="margin-top:2em;text-align:center;">
+          <button id="filter-popup-apply" class="popup-save" style="background:#a6aefc;color:#1a237e;margin-right:0.7em;">필터 적용</button>
+          <button id="filter-popup-reset" class="popup-cancel" style="background:#ececec;color:#7d7d7d;">초기화</button>
+        </div>
+      `;
+      // 이벤트 바인딩
+      filterPopupBox.querySelectorAll(".filter-popup-year").forEach(cb=>{
+        cb.onchange = function() {
+          if (cb.checked) {
+            if (!integratedFilter.years.includes(cb.value)) integratedFilter.years.push(cb.value);
+          } else {
+            integratedFilter.years = integratedFilter.years.filter(y=>y!==cb.value);
+          }
+          updateFilterSelectedCount();
+        };
+      });
+      filterPopupBox.querySelectorAll(".filter-popup-theme").forEach(cb=>{
+        cb.onchange = function() {
+          if (cb.checked) {
+            if (!integratedFilter.themes.includes(cb.value)) integratedFilter.themes.push(cb.value);
+          } else {
+            integratedFilter.themes = integratedFilter.themes.filter(t=>t!==cb.value);
+          }
+          updateFilterSelectedCount();
+        };
+      });
+      // 테마명 검색 input
+      const themeSearchInput = document.getElementById("filter-popup-theme-search");
+      themeSearchInput.oninput = function() {
+        integratedFilter.themeKeyword = themeSearchInput.value;
+        renderFilterPopup();
+        // 커서 유지
+        let inp = document.getElementById("filter-popup-theme-search");
+        if (inp) inp.selectionStart = inp.selectionEnd = inp.value.length;
+        updateFilterSelectedCount();
+      };
+      // 필터 적용
+      document.getElementById("filter-popup-apply").onclick = function(e) {
+        e.preventDefault();
+        filterPopupBg.style.display = filterPopupBox.style.display = "none";
+        updateFilterSelectedCount();
+        drawCards();
+      };
+      // 초기화
+      document.getElementById("filter-popup-reset").onclick = function(e) {
+        e.preventDefault();
+        integratedFilter.years = [];
+        integratedFilter.themes = [];
+        integratedFilter.themeKeyword = "";
+        renderFilterPopup();
+        updateFilterSelectedCount();
+      };
+      updateFilterSelectedCount();
+    }
+
+    function updateFilterSelectedCount() {
+      let txt = [];
+      if (integratedFilter.years.length>0) txt.push(`연도 ${integratedFilter.years.length}개`);
+      if (integratedFilter.themes.length>0) txt.push(`테마 ${integratedFilter.themes.length}개`);
+      if (integratedFilter.themeKeyword.trim().length>0) txt.push(`테마명 "${integratedFilter.themeKeyword}"`);
+      filterSelectedCount.textContent = txt.length ? txt.join(", ") : "";
+    }
 
     // --- 카드 수정/삭제 ---
     cardList.onclick = e => {
@@ -494,6 +649,15 @@
     }, {passive:true});
     // --- 최초 렌더 ---
     loadItems();
+
+    // ---- 기존 연도/테마 select 완전 제거 (top-bar) ----
+    // (실제 DOM에서 select#filter-year, select#filter-theme01 삭제)
+    window.addEventListener('DOMContentLoaded', ()=>{
+      let fy = document.getElementById('filter-year');
+      if (fy) fy.parentNode.removeChild(fy);
+      let ft = document.getElementById('filter-theme01');
+      if (ft) ft.parentNode.removeChild(ft);
+    });
 
     async function showLastModified() {
       const { data, error } = await supabase.from('items_log').select('at').order('at', { ascending: false }).limit(1);
