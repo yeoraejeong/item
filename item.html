@@ -11,31 +11,33 @@
       min-width: 350px;
       max-width: 95vw;
     }
-    .popup-form-flexrow {
+    .popup-form-row {
       display: flex;
-      flex-wrap: wrap;
-      gap: 0.48em 0.4em;
-      margin-bottom: 0.15em;
       align-items: center;
-    }
-    .popup-form-flexrow label {
-      min-width: 42px;
-      font-size: 0.97em;
-      margin-bottom: 0;
-      margin-right: 0.13em;
-      white-space: nowrap;
-    }
-    .popup-form-flexrow input,
-    .popup-form-flexrow select {
-      min-width: 52px;
-      max-width: 112px;
+      gap: 0.45em;
+      margin-bottom: 0.55em;
       width: 100%;
-      font-size: 0.98em;
-      padding: 0.4em 0.45em;
     }
-    .popup-form-flexrow input[type="file"] {
-      min-width: 100px;
-      max-width: 180px;
+    .popup-form-row label {
+      min-width: 48px;
+      font-size: 0.99em;
+      margin-right: 0.15em;
+      white-space: nowrap;
+      font-family: 'Freesentation6','Noto Sans KR',sans-serif;
+    }
+    .popup-form-row input,
+    .popup-form-row select {
+      font-size: 0.96em;
+      font-family: 'Freesentation3','Noto Sans KR',sans-serif;
+      padding: 0.41em 0.57em;
+      border-radius: 0.7em;
+      border: 1.1px solid #cbd3da;
+    }
+    .popup-form-row input[type="file"] {
+      min-width: 120px;
+      max-width: 250px;
+      font-size: 0.95em;
+      padding: 0.41em 0;
     }
     h1, h2, h3, h4, h5, h6, .popup-title, .popup-box label, .badge-sr, .badge-r, .badge-n, .admin-bar .admin-add-btn, .top-bar .admin-btn, .card-btns button {
     input#admin-pw::placeholder {
@@ -228,20 +230,25 @@
     </div>
     <div class="top-bar-filters">
       <input id="search-keyword" type="text" placeholder="템 이름 검색" style="min-width:220px;flex:2;">
+    // --- 관리자모드 진입/해제 시 검색창 스타일 동적 변경 ---
+    function updateSearchKeywordStyleForAdminMode(isAdminNow) {
+      if (!searchKeyword) return;
+      if (isAdminNow) {
+        searchKeyword.style.maxWidth = "135px";
+        searchKeyword.style.fontSize = "0.92em";
+        searchKeyword.style.minWidth = "";
+      } else {
+        searchKeyword.style.minWidth = "220px";
+        searchKeyword.style.fontSize = "1em";
+        searchKeyword.style.maxWidth = "";
+      }
+    }
       <button id="filter-integrated-btn" style="padding:0.65em 1.2em; border-radius:0.8em; background:#e2e8fc; color:#1a237e; border:none; cursor:pointer; font-size:1em;">통합 필터</button>
       <span id="filter-selected-count" style="font-size:0.92em; color:#5c5c5c; margin-left:0.7em;"></span>
     </div>
     <div class="category-tabs" id="category-tabs"></div>
   </div>
-  <!-- 관리자만: 관리바 -->
   <div class="main">
-    <div class="admin-bar" id="admin-bar">
-      <div class="filter-group">
-        <input id="admin-search" type="text" placeholder="템 이름 검색" style="min-width:120px;">
-        <select id="admin-filter-year"><option value="">연도</option></select>
-        <select id="admin-filter-theme01"><option value="">테마분류</option></select>
-      </div>
-    </div>
     <div class="card-list" id="card-list"></div>
   </div>
   <!-- 팝업 (추가/수정) -->
@@ -249,9 +256,14 @@
   <div class="popup-box" id="popup-box">
     <form id="popup-form" autocomplete="off">
       <h2 id="popup-title" style="margin:0 0 0.45em 0;font-size:1.11em;"></h2>
-      <div class="popup-form-flexrow">
-        <label>템 이름</label><input id="form-title" required>
-        <label>수량</label><input id="form-qty" type="number" min="0" required style="max-width:60px;">
+
+      <div class="popup-form-row">
+        <label>템 이름</label>
+        <input id="form-title" required style="flex:2; min-width:130px;">
+      </div>
+      <div class="popup-form-row" style="gap:0.7em;">
+        <label>수량</label>
+        <input id="form-qty" type="number" min="0" required style="max-width:60px;">
         <label>등급</label>
         <select id="form-grade" required style="max-width:66px;">
           <option value="">-</option>
@@ -283,15 +295,19 @@
           <option>입</option>
         </select>
       </div>
-      <div class="popup-form-flexrow">
+      <div class="popup-form-row">
         <label>출시일</label>
         <input id="form-date" type="date" required style="max-width:110px;">
-        <label>테마분류</label>
-        <input id="form-theme01" required style="max-width:110px;">
+        <label style="margin-left:0.8em;">테마분류</label>
+        <input id="form-theme01" required style="max-width:100px;">
+      </div>
+      <div class="popup-form-row">
         <label>테마명</label>
-        <input id="form-theme02" style="max-width:110px;">
+        <input id="form-theme02" style="flex:2; min-width:150px;">
+      </div>
+      <div class="popup-form-row">
         <label>썸네일</label>
-        <input id="form-img" type="file" accept="image/*" style="max-width:140px;">
+        <input id="form-img" type="file" accept="image/*" style="flex:2; min-width:170px;">
       </div>
       <div class="popup-btns" style="margin-top:1.1em;">
         <button type="submit" class="popup-save">저장</button>
@@ -347,10 +363,6 @@
     // 통합 필터 버튼 및 선택 카운트
     const filterIntegratedBtn = document.getElementById("filter-integrated-btn");
     const filterSelectedCount = document.getElementById("filter-selected-count");
-    // 관리자 필터
-    const adminSearch = document.getElementById("admin-search");
-    const adminFilterYear = document.getElementById("admin-filter-year");
-    const adminFilterTheme = document.getElementById("admin-filter-theme01");
 
     // --- 로그인/권한 로직 ---
     // 아이디 입력란 제거, 32f6c7은 상단에 고정
@@ -398,13 +410,10 @@
     let allThemes2 = [];
 
     function setFilters() {
-      // 연도/테마 옵션 동적 생성 (관리자 select용)
+      // 통합 필터용 전체 목록 저장 (연도는 2015~2025 고정)
       const years = [...new Set(allItems.map(x=>x.date?x.date.substr(0,4):"").filter(x=>x))];
       const themes = [...new Set(allItems.map(x=>x.theme01).filter(x=>x))];
       const themes2 = [...new Set(allItems.map(x=>x.theme02).filter(x=>x))];
-      adminFilterYear.innerHTML = '<option value="">연도</option>' + years.map(y=>`<option>${y}</option>`).join("");
-      adminFilterTheme.innerHTML = '<option value="">테마분류</option>' + themes.map(t=>`<option>${t}</option>`).join("");
-      // 통합 필터용 전체 목록 저장 (연도는 2015~2025 고정)
       allYears = [];
       for (let y = 2015; y <= 2025; ++y) allYears.push(String(y));
       allThemes = themes.slice();
@@ -431,37 +440,25 @@
 
     // --- 카드 목록 그리기 ---
     function drawCards() {
-      // 일반/관리자 모드 필터
-      const keyword = (isAdmin ? adminSearch.value : searchKeyword.value).trim();
+      // 템 이름 검색(상단 input) 필터는 항상 적용
+      const keyword = searchKeyword.value.trim();
       let items = allItems;
-      // 통합 필터 (일반 모드)
-      if (!isAdmin) {
-        // 연도 필터
-        if (integratedFilter.years.length > 0) {
-          items = items.filter(x => x.date && integratedFilter.years.includes(x.date.substr(0, 4)));
-        }
-        // 테마분류(theme01) 필터
-        if (integratedFilter.themes.length > 0) {
-          items = items.filter(x => x.theme01 && integratedFilter.themes.includes(x.theme01));
-        }
-        // 테마명(theme02) chips 필터
-        if (integratedFilter.themes2 && integratedFilter.themes2.length > 0) {
-          items = items.filter(x => x.theme02 && integratedFilter.themes2.includes(x.theme02));
-        }
-        // 테마명 검색어 필터
-        if (integratedFilter.themeKeyword && integratedFilter.themeKeyword.trim().length > 0) {
-          items = items.filter(x => x.theme02 && x.theme02.includes(integratedFilter.themeKeyword));
-        }
+      // 통합 필터 (상단 통합 필터만 사용)
+      if (integratedFilter.years.length > 0) {
+        items = items.filter(x => x.date && integratedFilter.years.includes(x.date.substr(0, 4)));
       }
-      // 기존 검색어
+      if (integratedFilter.themes.length > 0) {
+        items = items.filter(x => x.theme01 && integratedFilter.themes.includes(x.theme01));
+      }
+      if (integratedFilter.themes2 && integratedFilter.themes2.length > 0) {
+        items = items.filter(x => x.theme02 && integratedFilter.themes2.includes(x.theme02));
+      }
+      if (integratedFilter.themeKeyword && integratedFilter.themeKeyword.trim().length > 0) {
+        items = items.filter(x => x.theme02 && x.theme02.includes(integratedFilter.themeKeyword));
+      }
+      // 템 이름 검색
       if (keyword) items = items.filter(x=>x.title && x.title.includes(keyword));
-      // 관리자 모드 select 필터
-      if (isAdmin) {
-        const year = adminFilterYear.value;
-        const theme = adminFilterTheme.value;
-        if (year) items = items.filter(x=>x.date && x.date.startsWith(year));
-        if (theme) items = items.filter(x=>x.theme01 === theme);
-      }
+      // 카테고리 탭 필터
       if (selectedCategory) items = items.filter(x=>x.category === selectedCategory);
 
       cardList.innerHTML = "";
@@ -488,10 +485,6 @@
 
     // --- 카드 필터 이벤트 ---
     searchKeyword.oninput = drawCards;
-    // filterYear, filterTheme 제거됨 (통합 필터로 대체)
-    adminSearch.oninput = drawCards;
-    adminFilterYear.onchange = drawCards;
-    adminFilterTheme.onchange = drawCards;
     // ----------- 통합 필터 팝업 UI -----------
     // 팝업 배경/박스 생성 (스타일은 popup-bg/popup-box와 동일하게)
     let filterPopupBg = document.createElement('div');
@@ -931,6 +924,7 @@
         isAdmin = false;
         adminLoginBtn.textContent = "관리자모드";
         adminBar.classList.remove("active");
+        updateSearchKeywordStyleForAdminMode(false); // 관리자모드 해제 시 스타일 원복
         loadItems();
         // 버튼 제거 (관리자모드 해제 시)
         const btn = document.getElementById('admin-add-btn');
@@ -944,6 +938,7 @@
         isAdmin = true;
         adminBar.classList.add("active");
         adminLoginBtn.textContent = "관리자모드 해제";
+        updateSearchKeywordStyleForAdminMode(true); // 관리자모드 진입 시 스타일 적용
         loadItems();
         ensureAdminAddBtn();
       } else {
@@ -965,3 +960,7 @@
   </script>
 </body>
 </html>
+    // 페이지 로드 후, 이미 isAdmin인 경우(새로고침 등) 스타일 반영
+    window.addEventListener('DOMContentLoaded', function() {
+      updateSearchKeywordStyleForAdminMode(isAdmin);
+    });
