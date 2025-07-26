@@ -367,20 +367,26 @@
     const filterSelectedCount = document.getElementById("filter-selected-count");
 
     // --- 로그인/권한 로직 ---
-    // 아이디 입력란 제거, 32f6c7은 상단에 고정
+    // 관리자모드 토글 (중복 정의 제거, adminBar 관련 제거)
     adminLoginBtn.onclick = () => {
       if (isAdmin) {
         isAdmin = false;
         adminLoginBtn.textContent = "관리자모드";
-        adminBar.classList.remove("active");
+        updateSearchKeywordStyleForAdminMode(false); // 관리자모드 해제 시 스타일 원복
+        // 버튼 제거 (관리자모드 해제 시)
+        const btn = document.getElementById('admin-add-btn');
+        if (btn && btn.parentNode && btn.parentNode.classList.contains('top-bar-filters')) {
+          btn.parentNode.removeChild(btn);
+        }
         loadItems();
         return;
       }
       // 아이디는 "32f6c7"로 고정
       if (adminPw.value === "wjddufo1!") {
         isAdmin = true;
-        adminBar.classList.add("active");
         adminLoginBtn.textContent = "관리자모드 해제";
+        updateSearchKeywordStyleForAdminMode(true); // 관리자모드 진입 시 스타일 적용
+        ensureAdminAddBtn();
         loadItems();
       } else {
         alert("비밀번호가 틀렸습니다.");
@@ -919,34 +925,7 @@
     });
 
     // --- 관리자모드 진입 시 .top-bar-filters에 버튼 append
-    // 기존 adminLoginBtn.onclick 수정
-    const origAdminLoginHandler = adminLoginBtn.onclick;
-    adminLoginBtn.onclick = () => {
-      if (isAdmin) {
-        isAdmin = false;
-        adminLoginBtn.textContent = "관리자모드";
-        adminBar.classList.remove("active");
-        updateSearchKeywordStyleForAdminMode(false); // 관리자모드 해제 시 스타일 원복
-        loadItems();
-        // 버튼 제거 (관리자모드 해제 시)
-        const btn = document.getElementById('admin-add-btn');
-        if (btn && btn.parentNode && btn.parentNode.classList.contains('top-bar-filters')) {
-          btn.parentNode.removeChild(btn);
-        }
-        return;
-      }
-      // 아이디는 "32f6c7"로 고정
-      if (adminPw.value === "wjddufo1!") {
-        isAdmin = true;
-        adminBar.classList.add("active");
-        adminLoginBtn.textContent = "관리자모드 해제";
-        updateSearchKeywordStyleForAdminMode(true); // 관리자모드 진입 시 스타일 적용
-        loadItems();
-        ensureAdminAddBtn();
-      } else {
-        alert("비밀번호가 틀렸습니다.");
-      }
-    };
+    // (adminLoginBtn.onclick은 위에서 한 번만 정의, adminBar 관련 코드 제거)
 
     async function showLastModified() {
       const { data, error } = await supabase.from('items_log').select('at').order('at', { ascending: false }).limit(1);
@@ -959,13 +938,11 @@
       let s = `${last.getFullYear()}. ${String(last.getMonth()+1).padStart(2,"0")}. ${String(last.getDate()).padStart(2,"0")}. ${String(last.getHours()).padStart(2,"0")}:${String(last.getMinutes()).padStart(2,"0")}`;
       if (pwInput) pwInput.placeholder = `마지막 수정: ${s}`;
     }
-  </script>
-  <script>
     // 페이지 로드 후, 이미 isAdmin인 경우(새로고침 등) 스타일 반영
     window.addEventListener('DOMContentLoaded', function() {
       updateSearchKeywordStyleForAdminMode(isAdmin);
     });
-    </script>
+  </script>
 </body>
 </html>
     
