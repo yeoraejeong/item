@@ -3,8 +3,40 @@
 <head>
   <meta charset="UTF-8" />
   <title>32f6c7 중복글</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <style>
+    .popup-box {
+      resize: none !important;
+      overflow: hidden !important;
+      min-width: 350px;
+      max-width: 95vw;
+    }
+    .popup-form-flexrow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.48em 0.4em;
+      margin-bottom: 0.15em;
+      align-items: center;
+    }
+    .popup-form-flexrow label {
+      min-width: 42px;
+      font-size: 0.97em;
+      margin-bottom: 0;
+      margin-right: 0.13em;
+      white-space: nowrap;
+    }
+    .popup-form-flexrow input,
+    .popup-form-flexrow select {
+      min-width: 52px;
+      max-width: 112px;
+      width: 100%;
+      font-size: 0.98em;
+      padding: 0.4em 0.45em;
+    }
+    .popup-form-flexrow input[type="file"] {
+      min-width: 100px;
+      max-width: 180px;
+    }
     h1, h2, h3, h4, h5, h6, .popup-title, .popup-box label, .badge-sr, .badge-r, .badge-n, .admin-bar .admin-add-btn, .top-bar .admin-btn, .card-btns button {
     input#admin-pw::placeholder {
       font-size: 0.72em;
@@ -184,8 +216,8 @@
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
+  </head>
+<body style="overflow-x:hidden;overflow-y:auto;">
   <!-- 상단 로그인/필터 -->
   <div class="top-bar">
     <div style="display:flex;align-items:center;gap:0.9em;">
@@ -209,7 +241,6 @@
         <select id="admin-filter-year"><option value="">연도</option></select>
         <select id="admin-filter-theme01"><option value="">테마분류</option></select>
       </div>
-      <button class="admin-add-btn" id="admin-add-btn">아이템 추가하기</button>
     </div>
     <div class="card-list" id="card-list"></div>
   </div>
@@ -217,19 +248,19 @@
   <div class="popup-bg" id="popup-bg"></div>
   <div class="popup-box" id="popup-box">
     <form id="popup-form" autocomplete="off">
-      <h2 id="popup-title" style="margin:0 0 0.6em;font-size:1.12em;"></h2>
-      <label>템 이름<input id="form-title" required></label>
-      <label>수량<input id="form-qty" type="number" min="0" required></label>
-      <label>등급
-        <select id="form-grade" required>
-          <option value="">등급 선택</option>
+      <h2 id="popup-title" style="margin:0 0 0.45em 0;font-size:1.11em;"></h2>
+      <div class="popup-form-flexrow">
+        <label>템 이름</label><input id="form-title" required>
+        <label>수량</label><input id="form-qty" type="number" min="0" required style="max-width:60px;">
+        <label>등급</label>
+        <select id="form-grade" required style="max-width:66px;">
+          <option value="">-</option>
           <option value="SR">SR</option>
           <option value="R">R</option>
           <option value="N">N</option>
         </select>
-      </label>
-      <label>카테고리
-        <select id="form-category" required>
+        <label>카테고리</label>
+        <select id="form-category" required style="max-width:88px;">
           <option value="">카테고리 선택</option>
           <option>헤어</option>
           <option>팬티</option>
@@ -251,12 +282,18 @@
           <option>코</option>
           <option>입</option>
         </select>
-      </label>
-      <label>썸네일 첨부<input id="form-img" type="file" accept="image/*"></label>
-      <label>출시일<input id="form-date" type="date" required></label>
-      <label>테마 분류<input id="form-theme01" required></label>
-      <label>테마 이름<input id="form-theme02"></label>
-      <div class="popup-btns">
+      </div>
+      <div class="popup-form-flexrow">
+        <label>출시일</label>
+        <input id="form-date" type="date" required style="max-width:110px;">
+        <label>테마분류</label>
+        <input id="form-theme01" required style="max-width:110px;">
+        <label>테마명</label>
+        <input id="form-theme02" style="max-width:110px;">
+        <label>썸네일</label>
+        <input id="form-img" type="file" accept="image/*" style="max-width:140px;">
+      </div>
+      <div class="popup-btns" style="margin-top:1.1em;">
         <button type="submit" class="popup-save">저장</button>
         <button type="button" class="popup-cancel" id="popup-cancel">취소</button>
       </div>
@@ -792,11 +829,29 @@
     const formTheme01 = document.getElementById("form-theme01");
     const formTheme02 = document.getElementById("form-theme02");
 
-    document.getElementById("admin-add-btn").onclick = () => openPopup("추가");
-    document.getElementById("popup-cancel").onclick = closePopup;
+    // 아이템 추가 버튼을 .top-bar-filters에 append (중복 방지)
+    function ensureAdminAddBtn() {
+      if (!document.getElementById('admin-add-btn')) {
+        const btn = document.createElement('button');
+        btn.className = "admin-add-btn";
+        btn.id = "admin-add-btn";
+        btn.textContent = "아이템 추가하기";
+        btn.onclick = () => openPopup("추가");
+        document.querySelector('.top-bar-filters').appendChild(btn);
+      }
+    }
+    // 관리자모드 진입 시 버튼 이동/생성
+    const origAdminAddBtn = document.getElementById('admin-add-btn');
+    if (origAdminAddBtn && origAdminAddBtn.parentNode && origAdminAddBtn.parentNode.classList.contains('admin-bar')) {
+      origAdminAddBtn.parentNode.removeChild(origAdminAddBtn);
+    }
+    // 최초 진입 시, 관리자모드 진입 때마다 호출 필요. (아래에서 호출)
 
+    // 팝업 열기/닫기
+    document.getElementById("popup-cancel").onclick = closePopup;
     function openPopup(mode, item) {
       popupBg.style.display = popupBox.style.display = "block";
+      document.body.style.overflow = "hidden";
       popupTitle.textContent = mode === "수정" ? "아이템 수정" : "아이템 추가";
       formTitle.value = item?.title || "";
       formQty.value = item?.quantity || "";
@@ -810,10 +865,10 @@
     }
     function closePopup() {
       popupBg.style.display = popupBox.style.display = "none";
+      document.body.style.overflow = "";
       popupForm.reset();
       adminEditId = null;
     }
-
     popupBg.onclick = closePopup;
 
     popupForm.onsubmit = async e => {
@@ -867,6 +922,34 @@
       let ft = document.getElementById('filter-theme01');
       if (ft) ft.parentNode.removeChild(ft);
     });
+
+    // --- 관리자모드 진입 시 .top-bar-filters에 버튼 append
+    // 기존 adminLoginBtn.onclick 수정
+    const origAdminLoginHandler = adminLoginBtn.onclick;
+    adminLoginBtn.onclick = () => {
+      if (isAdmin) {
+        isAdmin = false;
+        adminLoginBtn.textContent = "관리자모드";
+        adminBar.classList.remove("active");
+        loadItems();
+        // 버튼 제거 (관리자모드 해제 시)
+        const btn = document.getElementById('admin-add-btn');
+        if (btn && btn.parentNode && btn.parentNode.classList.contains('top-bar-filters')) {
+          btn.parentNode.removeChild(btn);
+        }
+        return;
+      }
+      // 아이디는 "32f6c7"로 고정
+      if (adminPw.value === "wjddufo1!") {
+        isAdmin = true;
+        adminBar.classList.add("active");
+        adminLoginBtn.textContent = "관리자모드 해제";
+        loadItems();
+        ensureAdminAddBtn();
+      } else {
+        alert("비밀번호가 틀렸습니다.");
+      }
+    };
 
     async function showLastModified() {
       const { data, error } = await supabase.from('items_log').select('at').order('at', { ascending: false }).limit(1);
