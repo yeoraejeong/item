@@ -5,6 +5,10 @@
   <title>32f6c7 중복글</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <style>
+    html, body {
+      overscroll-behavior: contain;
+      touch-action: manipulation;
+    }
     .popup-box {
       resize: none !important;
       overflow: hidden !important;
@@ -291,7 +295,7 @@
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   </head>
-<body style="overflow-x:hidden;overflow-y:auto;">
+<body style="overflow-x:hidden;overflow-y:auto; overscroll-behavior: contain; touch-action: manipulation;">
   <!-- 상단 로그인/필터 -->
   <div class="top-bar">
     <div style="display:flex;align-items:center;gap:0.9em;">
