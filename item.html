@@ -91,8 +91,18 @@
       gap: 0.6em;
       width: 100%;
       align-items: center;
+      justify-content: flex-start;
+      /* Vertically and horizontally align children */
     }
-    .top-bar input[type=password], .top-bar input[type=text] {padding:0.6em; border-radius:0.7em; border:1px solid #cbd3da; font-size:1em;}
+    .top-bar input[type=password], .top-bar input[type=text] {
+      padding: 0.6em;
+      border-radius: 0.7em;
+      border: 1px solid #cbd3da;
+      font-size: 1em;
+      height: 2.2em;
+      box-sizing: border-box;
+      vertical-align: middle;
+    }
     .top-bar select {padding:0.5em 0.8em; border-radius:0.7em; border:1.2px solid #dbe1ea; background:#f4f5fb;}
     .top-bar button {padding:0.65em 1.2em; border-radius:0.8em; background:#a6aefc; color:#1a237e; border:none; cursor:pointer;}
     .top-bar .admin-btn {background:#222; color:#fff;}
@@ -100,33 +110,64 @@
       flex: 2 1 200px;
       min-width: 130px;
       max-width: 380px;
-      padding: 0.34em 0.68em;
       font-size: 0.86em;
-      border-radius: 0.8em;
+      border-radius: 0.7em;
       border: 1px solid #cbd3da;
-      height: 2em;
       font-family: 'Freesentation3','Noto Sans KR',sans-serif;
       box-sizing: border-box;
+      height: 2.2em;
+      padding: 0.6em 0.68em;
+      vertical-align: middle;
+      display: inline-block;
     }
-    #filter-integrated-btn, .admin-add-btn {
-      flex: 0 0 110px;
-      min-width: 90px;
-      max-width: 120px;
+    #filter-integrated-btn,
+    #admin-login-btn,
+    .admin-add-btn {
+      width: 110px !important;
+      min-width: 110px !important;
+      max-width: 110px !important;
       font-size: 0.86em;
-      height: 2em;
-      border-radius: 0.8em;
-      padding: 0 1em;
+      border-radius: 0.7em !important;
+      padding: 0.6em 0 !important;
       margin: 0 !important;
       font-family: 'Freesentation6','Noto Sans KR',sans-serif;
+      box-sizing: border-box;
+      height: 2.2em !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: middle;
     }
     .admin-add-btn { margin-left: 0.18em !important; }
     @media (max-width: 600px) {
       .top-bar-filters {
         flex-wrap: wrap;
         gap: 0.38em;
+        align-items: center;
+        justify-content: flex-start;
       }
-      #search-keyword { min-width: 90px; max-width: none; height: 2em; padding: 0.34em 0.68em; font-size: 0.86em;}
-      #filter-integrated-btn, .admin-add-btn { flex: 1 1 0; min-width: 0; height: 2em; font-size: 0.86em;}
+      #search-keyword {
+        min-width: 70px;
+        max-width: none;
+        font-size: 0.86em;
+        border-radius: 0.7em;
+        height: 2.2em;
+        padding: 0.6em 0.68em;
+        vertical-align: middle;
+        display: inline-block;
+      }
+      #filter-integrated-btn,
+      #admin-login-btn,
+      .admin-add-btn {
+        width: 90px !important;
+        min-width: 90px !important;
+        max-width: 90px !important;
+        font-size: 0.86em;
+        border-radius: 0.7em !important;
+        height: 2.2em !important;
+        padding: 0.6em 0 !important;
+        vertical-align: middle;
+      }
     }
     .main {max-width:1120px; margin:0.7em auto 0; padding:0 1em;}
     .card-list {display:flex; flex-wrap:wrap; gap:1.5em; margin-top:1em; justify-content:center;}
@@ -981,3 +1022,4 @@
 </body>
 </html>
     
+  <!-- style moved to main style block above, see CSS for unified height/padding/alignment -->
