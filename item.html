@@ -193,10 +193,11 @@
       text-align: center;
       word-break: break-all;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       justify-content: center;
-      gap: 0.4em 0.08em;
+      gap: 0.2em 0;
     }
     .badge-sr { background: #fff9d7 !important; color: #a39100 !important; }
     .badge-r { background: #e2f5ff !important; color: #2387b2 !important; }
@@ -581,15 +582,15 @@
       }
       items.forEach(item => {
         const badgeClass = item.grade === "SR" ? "badge-sr" : item.grade === "R" ? "badge-r" : "badge-n";
-        // 등급 뱃지는 badgeClass를 사용, 카드 배경은 항상 흰색!
+        // 이름/수량 인라인, 등급 배지는 아래 한 줄
         cardList.innerHTML += `
           <div class="item-card">
             <img class="item-img" src="${item.thumbnail||''}" alt="썸네일">
-            <div class="item-title" style="display:flex;align-items:center;flex-wrap:wrap;justify-content:center;gap:0.4em 0.1em;word-break:break-all;">
-              <span style="flex:1;min-width:0;">${item.title||''}</span>
-              <span class="badge ${badgeClass}" style="margin-left:0.2em;font-size:0.81em;min-width:2.4em;text-align:center;">${item.grade||''}</span>
-              <span class="badge-qty" style="margin-left:0.21em;display:inline-block;background:#eceff5;color:#263256;border-radius:50%;font-size:0.79em;padding:0.06em 0.65em 0.04em 0.65em;vertical-align:middle;margin-right:0;line-height:1.15;">${item.quantity||''}</span>
+            <div class="item-title-inline">
+              <span class="item-title-text">${item.title||''}</span>
+              <span class="badge-qty">${item.quantity||''}</span>
             </div>
+            <span class="badge ${badgeClass}" style="font-size:0.81em;min-width:2.4em;text-align:center;margin-top:0.33em;display:inline-block;">${item.grade||''}</span>
             ${isAdmin ? `
             <div class="card-btns">
               <button class="edit-btn" data-id="${item.id}">수정</button>
@@ -598,6 +599,7 @@
           </div>
         `;
       });
+  <style>
     }
 
     // --- 카드 필터 이벤트 ---
@@ -1056,3 +1058,36 @@
 </html>
     
   <!-- style moved to main style block above, see CSS for unified height/padding/alignment -->
+    .item-title-inline {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 0.1em;
+      font-size: 0.91em;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.21em;
+      word-break: break-all;
+    }
+    .item-title-text {
+      display: inline;
+      word-break: break-all;
+      max-width: 95%;
+      font-family: 'Freesentation3', 'Noto Sans KR', sans-serif;
+    }
+    .badge-qty {
+      display: inline-block;
+      background: #eceff5;
+      color: #263256;
+      border-radius: 50%;
+      font-size: 0.79em;
+      padding: 0.06em 0.62em 0.04em 0.62em;
+      vertical-align: middle;
+      margin-left: 0.18em;
+      min-width: 2em;
+      text-align: center;
+      line-height: 1.13;
+      font-family: 'Freesentation6','Noto Sans KR',sans-serif;
+      font-weight: bold;
+    }
