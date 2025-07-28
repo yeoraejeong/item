@@ -191,34 +191,34 @@
     .badge-r { background:#fffbe3; color:#be9800;}
     .badge-n { background:#eefaff; color:#1976d2;}
     .item-card .item-title {
-      font-size: 0.93em;
+      font-size: 0.91em;
       font-weight: 400;
-      /* margin-bottom 제거하여 줄 간격 최소화 */
       margin-bottom: 0;
       text-align: center;
       display: flex;
       align-items: baseline;
       justify-content: center;
-      gap: 0.1em;
-      /* 여백 최소화, 줄 간격 tight */
+      gap: 0;
+      /* 이름과 수량이 한 줄에 tight하게, 말줄임 처리 */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .item-card .item-qty { display:none; }
     .qty-badge {
       display: inline-block;
-      margin-left: 0.4em;
+      margin-left: 0.23em;
       background: #eceef5;
       border-radius: 50%;
-      width: 1.4em;
-      height: 1.4em;
-      font-size: 0.85em;
+      width: 1.26em;
+      height: 1.26em;
+      font-size: 0.74em;
       font-weight: bold;
       color: #222;
       text-align: center;
-      line-height: 1.4em;
+      line-height: 1.26em;
       vertical-align: baseline;
       font-family: 'Freesentation6','Noto Sans KR',sans-serif;
-      /* 여백 최소화, baseline 정렬 */
-      margin-bottom: 0;
       padding: 0;
     }
     .item-card .card-btns {display:flex; gap:0.5em;}
@@ -589,7 +589,7 @@
           <div class="item-card" style="background:${item.grade === "SR" ? '#ffeaf4':item.grade==="R"?'#fffbe3':'#eefaff'}">
             <img class="item-img" src="${item.thumbnail||''}" alt="썸네일">
             <div class="item-title">
-              ${item.title||''}<span class="qty-badge">${item.quantity||''}</span>
+              <span class="item-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;">${item.title||''}</span><span class="qty-badge">${item.quantity||''}</span>
             </div>
             ${isAdmin ? `
             <div class="card-btns">
