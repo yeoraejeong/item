@@ -207,16 +207,16 @@
     .item-card .item-qty { display:none; }
     .qty-badge {
       display: inline-block;
-      margin-left: 0.23em;
+      margin-left: 0.35em;
       background: #eceef5;
       border-radius: 50%;
-      width: 1.26em;
-      height: 1.26em;
+      min-width: 1.32em;
+      height: 1.32em;
       font-size: 0.74em;
       font-weight: bold;
       color: #222;
       text-align: center;
-      line-height: 1.26em;
+      line-height: 1.32em;
       vertical-align: baseline;
       font-family: 'Freesentation6','Noto Sans KR',sans-serif;
       padding: 0;
@@ -589,7 +589,8 @@
           <div class="item-card" style="background:${item.grade === "SR" ? '#ffeaf4':item.grade==="R"?'#fffbe3':'#eefaff'}">
             <img class="item-img" src="${item.thumbnail||''}" alt="썸네일">
             <div class="item-title">
-              <span class="item-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;">${item.title||''}</span><span class="qty-badge">${item.quantity||''}</span>
+              <span class="item-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;">${item.title||''}</span>
+              <span class="qty-badge" style="margin-left:0.35em;background:#eceef5;display:inline-block;border-radius:50%;min-width:1.32em;height:1.32em;line-height:1.32em;font-size:0.74em;font-weight:bold;color:#222;text-align:center;vertical-align:baseline;font-family:'Freesentation6','Noto Sans KR',sans-serif;">${item.quantity||''}</span>
             </div>
             ${isAdmin ? `
             <div class="card-btns">
