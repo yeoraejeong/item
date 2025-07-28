@@ -175,48 +175,88 @@
     }
     .main {max-width:1120px; margin:0.7em auto 0; padding:0 1em;}
     .card-list {display:flex; flex-wrap:wrap; gap:1.5em; margin-top:1em; justify-content:center;}
-    .item-card { background:#fff !important; border-radius:1.1em; box-shadow:0 2px 10px #0001; padding:0.6em; width:80px; display:flex; flex-direction:column; align-items:center; position:relative;}
+    .item-card {
+      background: #fff;
+      border-radius: 1.1em;
+      box-shadow: 0 2px 10px #0001;
+      padding: 0.45em;
+      width: 66px;
+      min-height: 112px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
     .item-card .item-img {
       width: 100%;
       aspect-ratio: 5/4;
       object-fit: cover;
       border-radius: 0.5em;
-      margin-bottom: 0.4em;
+      margin-bottom: 0.23em;
       background: #eee;
       display: block;
       box-shadow:0 0 4px #0001;
+      position: relative;
     }
-    .item-card .badge { display:inline-block; font-size:0.98em; padding:0.19em 1.1em; border-radius:0.9em; margin-bottom:0.25em;}
-    .item-card .item-title {
-      font-size: 0.91em;
-      font-weight: 400;
+    .item-card .badge-grade {
+      position: absolute;
+      top: 0.18em;
+      right: 0.18em;
+      font-size: 0.69em;
+      min-width: 1.62em;
+      padding: 0.15em 0.3em;
+      border-radius: 0.65em;
+      font-family: 'Freesentation6','Noto Sans KR',sans-serif;
       text-align: center;
-      word-break: break-all;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex-wrap: nowrap;
-      justify-content: center;
-      gap: 0.2em 0;
+      z-index: 2;
+      background: #fff9d7;
+      color: #a39100;
+      box-shadow: 0 1px 3px #ffe5b2b5;
     }
-    .badge-sr { background: #fff9d7 !important; color: #a39100 !important; }
-    .badge-r { background: #e2f5ff !important; color: #2387b2 !important; }
-    .badge-n { background: #ededed !important; color: #666 !important; }
+    .item-card .badge-grade.badge-r {
+      background: #e2f5ff !important;
+      color: #2387b2 !important;
+      box-shadow: 0 1px 3px #c2e8ffd5;
+    }
+    .item-card .badge-grade.badge-n {
+      background: #ededed !important;
+      color: #666 !important;
+      box-shadow: 0 1px 3px #e8e8e8d0;
+    }
+    .item-title-inline {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 0.12em;
+      width: 100%;
+      font-size: 0.91em;
+      margin: 0.05em 0 0.01em 0;
+      word-break: break-all;
+    }
+    .item-title-text {
+      flex: 1 1 auto;
+      min-width: 0;
+      text-align: left;
+      font-size: 0.87em;
+      font-family: 'Freesentation3','Noto Sans KR',sans-serif;
+      word-break: break-all;
+    }
     .badge-qty {
       display: inline-block;
       background: #eceff5;
       color: #263256;
       border-radius: 50%;
-      font-size: 0.79em;
-      padding: 0.06em 0.65em 0.04em 0.65em;
-      vertical-align: middle;
-      margin-right: 0;
-      margin-left: 0.17em;
+      font-size: 0.70em;
+      padding: 0.02em 0.41em 0.01em 0.41em;
       font-family: 'Freesentation6','Noto Sans KR',sans-serif;
       font-weight: bold;
-      min-width: 2.1em;
+      min-width: 1.6em;
+      margin-left: 0.12em;
+      margin-bottom: 0.06em;
       text-align: center;
-      line-height: 1.15;
+      line-height: 1.13;
+      vertical-align: middle;
     }
     .item-card .card-btns {display:flex; gap:0.5em;}
     .item-card .edit-btn, .item-card .del-btn { border:none; background:#ececec; border-radius:0.7em; padding:0.3em 0.95em; font-size:0.85em; cursor:pointer;}
@@ -581,16 +621,14 @@
         return;
       }
       items.forEach(item => {
-        const badgeClass = item.grade === "SR" ? "badge-sr" : item.grade === "R" ? "badge-r" : "badge-n";
-        // 이름/수량 인라인, 등급 배지는 아래 한 줄
         cardList.innerHTML += `
           <div class="item-card">
             <img class="item-img" src="${item.thumbnail||''}" alt="썸네일">
+            <span class="badge-grade badge-${item.grade ? item.grade.toLowerCase() : 'n'}">${item.grade||''}</span>
             <div class="item-title-inline">
               <span class="item-title-text">${item.title||''}</span>
               <span class="badge-qty">${item.quantity||''}</span>
             </div>
-            <span class="badge ${badgeClass}" style="font-size:0.81em;min-width:2.4em;text-align:center;margin-top:0.33em;display:inline-block;">${item.grade||''}</span>
             ${isAdmin ? `
             <div class="card-btns">
               <button class="edit-btn" data-id="${item.id}">수정</button>
