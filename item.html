@@ -175,7 +175,7 @@
     }
     .main {max-width:1120px; margin:0.7em auto 0; padding:0 1em;}
     .card-list {display:flex; flex-wrap:wrap; gap:1.5em; margin-top:1em; justify-content:center;}
-    .item-card { background:#fff; border-radius:1.1em; box-shadow:0 2px 10px #0001; padding:0.6em; width:80px; display:flex; flex-direction:column; align-items:center; position:relative;}
+    .item-card { background:#fff !important; border-radius:1.1em; box-shadow:0 2px 10px #0001; padding:0.6em; width:80px; display:flex; flex-direction:column; align-items:center; position:relative;}
     .item-card .item-img {
       width: 100%;
       aspect-ratio: 5/4;
@@ -556,13 +556,9 @@
       }
       items.forEach(item => {
         const badgeClass = item.grade === "SR" ? "badge-sr" : item.grade === "R" ? "badge-r" : "badge-n";
-        // SR: #fff9d7, R: #e2f5ff, N: #ededed
-        let cardBg = "#ededed";
-        if (item.grade === "SR") cardBg = "#fff9d7";
-        else if (item.grade === "R") cardBg = "#e2f5ff";
-        else if (item.grade === "N") cardBg = "#ededed";
+        // 등급 뱃지는 badgeClass를 사용, 카드 배경은 항상 흰색!
         cardList.innerHTML += `
-          <div class="item-card" style="background:${cardBg}">
+          <div class="item-card">
             <img class="item-img" src="${item.thumbnail||''}" alt="썸네일">
             <div class="item-title">${item.title||''}</div>
             <div class="item-qty">수량 : <b>${item.quantity||''}</b></div>
