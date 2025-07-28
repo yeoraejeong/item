@@ -557,7 +557,7 @@
       items.forEach(item => {
         const badgeClass = item.grade === "SR" ? "badge-sr" : item.grade === "R" ? "badge-r" : "badge-n";
         cardList.innerHTML += `
-          <div class="item-card" style="background:${item.grade === "SR" ? '#ffe3ef':item.grade==="R"?'#fff6c1':'#e2f5ff'}">
+          <div class="item-card" style="background:${item.grade === "SR" ? '#ffeaf4':item.grade==="R"?'#fffbe3':'#eefafff'}">
             <img class="item-img" src="${item.thumbnail||''}" alt="썸네일">
             <div class="item-title">${item.title||''}</div>
             <div class="item-qty">수량 : <b>${item.quantity||''}</b></div>
