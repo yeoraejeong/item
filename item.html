@@ -199,10 +199,12 @@
       align-items: baseline;
       justify-content: center;
       gap: 0;
-      /* 이름과 수량이 한 줄에 tight하게, 말줄임 처리 */
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      white-space: normal;
+      word-break: keep-all;
+      /* overflow: hidden; */
+      /* text-overflow: ellipsis; */
+      line-height: 1.13em;
+      max-height: 2.3em;
     }
     .item-card .item-qty { display:none; }
     .qty-badge {
