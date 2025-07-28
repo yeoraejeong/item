@@ -187,9 +187,9 @@
       box-shadow:0 0 4px #0001;
     }
     .item-card .badge { display:inline-block; font-size:0.98em; padding:0.19em 1.1em; border-radius:0.9em; margin-bottom:0.25em;}
-    .badge-sr { background:#ffe3ef; color:#e665a7;}
-    .badge-r { background:#fff6c1; color:#bea700;}
-    .badge-n { background:#e2f5ff; color:#1976d2;}
+    .badge-sr { background: #fff9d7; color: #a39100; }   /* 연한 노란색, 어두운 노랑글씨 */
+    .badge-r { background: #e2f5ff; color: #2387b2; }    /* 연한 하늘색, 파랑글씨 */
+    .badge-n { background: #ededed; color: #666; }       /* 옅은 회색, 진회색글씨 */
     .item-card .item-title { font-size:0.9em; font-weight:400; margin-bottom:0.13em; text-align:center;}
     .item-card .item-qty { color:#555; font-size:0.91em; margin-bottom:0.5em;}
     .item-card .card-btns {display:flex; gap:0.5em;}
@@ -556,8 +556,13 @@
       }
       items.forEach(item => {
         const badgeClass = item.grade === "SR" ? "badge-sr" : item.grade === "R" ? "badge-r" : "badge-n";
+        // SR: #fff9d7, R: #e2f5ff, N: #ededed
+        let cardBg = "#ededed";
+        if (item.grade === "SR") cardBg = "#fff9d7";
+        else if (item.grade === "R") cardBg = "#e2f5ff";
+        else if (item.grade === "N") cardBg = "#ededed";
         cardList.innerHTML += `
-          <div class="item-card" style="background:${item.grade === "SR" ? '#ffeaf4':item.grade==="R"?'#fffbe3':'#eefafff'}">
+          <div class="item-card" style="background:${cardBg}">
             <img class="item-img" src="${item.thumbnail||''}" alt="썸네일">
             <div class="item-title">${item.title||''}</div>
             <div class="item-qty">수량 : <b>${item.quantity||''}</b></div>
